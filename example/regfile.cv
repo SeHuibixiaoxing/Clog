@@ -1,0 +1,38 @@
+/*
+验证语法：
+1、时序逻辑：clock类型、when表达式
+2、Mux运算符
+3、数组
+*/
+
+
+module regfile(
+    input clock clk,
+
+    // read port 1
+    input  wire[5] raddr1,
+    output wire[35] rdata1,
+
+    // read port 2
+    input  wire[5] raddr2,
+    output wire[32] rdata2,
+
+    // write port
+    input wire we,
+    input  wire[5] waddr ,
+    input  wire[32] wdata
+) {
+    reg[32] rf[32];
+
+    //write
+    when(clk.rising) {
+        if (we)
+            rf[waddr] := wdata;
+    }
+
+    //read port 1
+    rdata1 := Mux((raddr1==5'b0), 32'b0, rf[raddr1]);
+
+    //read port 2
+    rdata2 := Mux((raddr2==5'b0), 32'b0, rf[raddr2]);
+}

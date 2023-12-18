@@ -1,0 +1,64 @@
+/*
+验证语法：
+1、bundle
+*/
+
+bundle id_to_exe_io (
+    wire id_is_lb,
+    wire id_is_lbu,
+    wire id_is_lh,
+    wire id_is_lhu,
+    wire[32] rs_value,
+    wire[32] rt_value,
+    wire[5] dest,
+    wire[32] ds_pc
+);
+
+module id (
+    output id_to_exe_io id_to_exe_bus
+) {
+    id_to_exe_bus.id_is_lb := 0;
+    id_to_exe_bus.id_is_lbu := 0;
+    id_to_exe_bus.id_is_lh := 0;
+    id_to_exe_bus.id_is_lhu := 1;
+
+    id_to_exe_bus.rs_value := 32'ha;
+    id_to_exe_bus.rt_value := 32'hb;
+    id_to_exe_bus.dest := 3;
+    id_to_exe_bus.ds_pc := 32'h80000004;
+}
+
+module exe(
+    input id_to_exe_io from_id_bus
+    output wire id_is_lb,
+    output wire id_is_lbu,
+    output wire id_is_lh,
+    output wire id_is_lhu,
+    output wire[32] rs_value,
+    output wire[32] rt_value,
+    output wire[5] dest,
+    output wire[32] ds_pc
+) {
+    id_is_lb := from_id_bus.id_is_lb;
+    id_is_lbu := from_id_bus.id_is_lbu;
+    id_is_lh := from_id_bus.id_is_lh;
+    id_is_lhu := from_id_bus.id_is_lhu;
+
+    rs_value := from_id_bus.rs_value;
+    rt_value := from_id_bus.rt_value;
+    dest := from_id_bus.dest;
+    ds_pc := from_id_bus.ds_pc;
+
+}
+
+module top_module(
+    output id_to_exe_io bus_out
+
+) {
+    id_to_exe_io id_to_exe_bus;
+
+    id id_1(
+        out.id_to_exe_bus(id_to_exe_bus)
+    );
+    bus_out := id_to_exe_bus
+}

@@ -1,0 +1,16 @@
+/*
+验证语法：
+1、循环例化generate for
+*/
+
+module decoder(
+    para int IN_WIDTH=5,
+    para int OUT_WIDTN=32
+    input  wire [IN_WIDTH] in,
+    output wire [OUT_WIDTN] out
+){
+    generate for (int i=0; i<OUT_WIDTN; i=i+1) : gen_for_dec {
+        out[i] := (in == i);
+    }
+}
+
