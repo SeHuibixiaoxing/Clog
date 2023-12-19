@@ -32,7 +32,9 @@ reserved = {
     'signal': 'SIGNAL',
     'rising': 'RISING',
     'falling': 'FALLING',
-    'generate': 'GENERATE'
+    'generate': 'GENERATE',
+    'in': 'IN',
+    'out': 'OUT',
 }
 
 
