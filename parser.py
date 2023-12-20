@@ -42,7 +42,7 @@ def p_constDecl_repeat(p):
     """constDef_repeat : empty
                         | ',' comseDef constDef_repeat"""
     p[0] = AST.ConstDeclNode()
-    if len(p) == 3:
+    if len(p) == 4:
         p[0].add_child(p[2])
         p[0].merge(p[3])
 
@@ -375,9 +375,245 @@ def p_elifStmt(p):
 
 
 def p_elseStmt(p):
-    """elseStmt : ELSE 'stmt'"""
+    """elseStmt : ELSE stmt"""
     p[0] = AST.ElseStmtNode(p[3])
 
 def p_ifStmt(p):
     """ifStmt : IF '(' exp ')' stmt elifStmt elseStmt"""
     p[0] = AST.IfStmtNode(p[3], p[5], p[6], p[7])
+
+
+def p_forStmt(p):
+    """
+     forStmt : FOR '(' varDecl ';' exp ; exp ')' stmt
+            | GENERATE FOR '(' varDecl ';' exp ; exp ')' ':' ID stmt
+    """
+    if p[1] == "generate":
+        p[0] = AST.ForStmtNode(p[4], p[6], p[8], p[11],p[12])
+        p[0].is_generate = True
+    else:
+        p[0] = AST.ForStmtNode(p[3],p[5],p[7],p[9])
+
+def p_exp(p):
+    """
+    exp : lOrExp
+    """
+    p[0] = p[1]
+
+def p_lVal(p):
+    """
+    lVal : ID array_exp_repeat1
+        | ID array_exp_repreat2
+        | '{' ID array_exp_repeat1 lVal_repeat '}'
+        | '{' ID array_exp_repreat2 lVal_repeat '}'
+        | 'MUX' '(' exp ',' exp ',' exp ')'
+        | lVal '.' ID
+    """
+    p[0] = AST.LValNode()
+    if len(p) == 3:
+        p[0].add_child(p[1],p[2])
+    if len(p) == 6:
+        p[0].add_child(p[2],p[3],p[4])
+    if len(p) == 8:
+        p[0].add_child(p[3],p[5],p[7])
+    if len(p) == 4:
+        p[0].add_child(p[1],p[3])
+
+def p_primaryExp(p):
+    """
+    primaryExp : '(' exp ')'| lVal | number
+    """
+    if len(p) == 4:
+        p[0] = AST.PrimaryExpNode(p[2])
+        p[0].flag = 'add brace'
+    else:
+        p[0] = AST.PrimaryExpNode(p[1])
+
+def p_lVal_repeat(p):
+    """
+    lVal_repeat : empty
+                | ',' lVal  lVal_repeat
+    """
+    p[0] = AST.ASTNode()
+    if len(p) == 4:
+        p[0].add_child(p[2])
+        p[0].merge(p[3])
+
+def p_array_exp_repeat1(p):
+    """
+    array_exp_repeat1 : empty
+                        | '[' exp ']' array_exp_repeat1
+    """
+    p[0] = AST.ASTNode()
+    if len(p) == 5:
+        p[0].add_child(p[2])
+        p[0].merge(p[4])
+    p[0].flag = 'repeat_1'
+
+def p_array_exp_repreate2(p):
+    """
+    array_exp_repreate2 : empty
+                        | '[' exp ':' exp ']' array_exp_repeat2
+    """
+    p[0] = AST.ASTNode()
+    if len(p) == 7:
+        p[0].add_child(p[2],p[4])
+        p[0].merge(p[6])
+    p[0].flag = 'repeat_2'
+
+def p_number(p):
+    """
+    number : INTEGER_CONST | FLOAT_CONST | circuit_const
+    """
+    p[0] = p[1]
+def p_circuit_const(p):
+    """
+    circuit_const : exp BIT_WIDTH_NUMBER
+    """
+    p[0] = AST.CircuitConstNode(p[1],p[2])
+
+def p_unaryExp(p):
+    """
+    unaryExp : primaryExp
+                |ID '(' ')'
+                |ID '(' funcRPramas ')'
+                |SIGNAL '(' unaryExp ')'
+                |unaryOp unaryExp
+    """
+    if len(p) == 2:
+        p[0] = p[1]
+    if len(p) == 4:
+        p[0] = AST.UnaryExpNode(p[1])
+        p[0].flag = 'func no param'
+    if len(p) == 5:
+        if p[1] == 'Signal':
+            p[0] = AST.UnaryExpNode(p[3])
+            p[0].flag = 'signal'
+        else:
+            p[0] = AST.UnaryExpNode(p[1],p[3])
+            p[0].flag = 'func with param'
+    if len(p) == 3:
+        p[0] = AST.UnaryExpNode(p[1], p[2])
+
+def p_unaryOp(p):
+    """
+    unaryOp : ADD|SUB|NOT|NOTL
+    """
+    p[0] = AST.UnaryOpNode(p[1])
+
+def p_funcRParams(p):
+    """
+    funcRParmas : exp
+                | exp exp_repreat
+    """
+    if len(p) == 2:
+        p[0].add_children(p[1])
+    else:
+        p[0].add_children(p[1],p[2])
+def p_exp_repeat(p):
+    """
+    exp_repeat : ',' exp exp_repeat
+    """
+    p[0] = AST.ASTNode()
+    p[0].add_children(p[2])
+    p[0].merge(p[3])
+    p[0].flag = 'exp repeat'
+
+def p_mulExp(p):
+    """
+    mulExp : unaryExp
+            | mulExp MUL unaryExp
+            | mulExp DIV unaryExp
+            | mulExp MOD unaryExp
+            | mulExp POWER unaryExp
+    """
+    if len(p) == 2:
+        p[0] = AST.MulExpExpNode(p[1])
+    else:
+        p[0] = AST.MulExpExpNode(p[1],p[2],p[3])
+
+def p_addExp(p):
+    """
+    addExp : mulExp
+            | addExp ADD mulExp
+            | addExp SUB mulExp
+    """
+    if len(p) == 2:
+        p[0] = AST.AddExpNode(p[1])
+    else:
+        p[0] = AST.AddExpNode(p[1],p[2],p[3])
+
+def p_shiftExp(p):
+    """
+    shiftExp : addExp
+            | shiftExp SLL addExp
+            | shiftExp SRL addExp
+            | shiftExp SRA addExp
+    """
+    if len(p) == 2:
+        p[0] = AST.ShiftExpNode(p[1])
+    else:
+        p[0] = AST.ShiftExpNode(p[1],p[2],p[3])
+
+
+def p_relExp(p):
+    """
+    relExp : shiftExp
+            | relExp LT addExp
+            | relExp GT addExp
+            | relExp GE addExp
+            | relExp LE addExp
+    """
+    if len(p) == 2:
+        p[0] = AST.RelExpNode(p[1])
+    else:
+        p[0] = AST.RelExpNode(p[1],p[2],p[3])
+
+
+def p_eqExp(p):
+    """
+    eqExp : relExp
+            | eqExp LT eqExp
+            | eqExp GT eqExp
+            | eqExp GE eqExp
+            | eqExp LE eqExp
+    """
+    if len(p) == 2:
+        p[0] = AST.EqExpNode(p[1])
+    else:
+        p[0] = AST.EqExpNode(p[1],p[2],p[3])
+
+def p_redExp(p):
+    """
+    redExp : eqExp
+            | AND eqExp
+            | OR eqExp
+            | NOT eqExp
+            | XOR eqExp
+            | XNOR eqExp
+
+    """
+    if len(p) == 2:
+        p[0] = AST.RedExpNode(p[1])
+    else:
+        p[0] = AST.RedExpNode(p[1],p[2])
+
+def p_lAndExp(p):
+    """
+    lAndExp : redExp
+            | lAndExp LAND redExp
+    """
+    if len(p) == 2:
+        p[0] = AST.LAndExpNode(p[1])
+    else:
+        p[0] = AST.LAndExpNode(p[1],p[2],p[3])
+
+def p_lOrExp(p):
+    """
+    lOrExp : lAndExp
+            | lOrExp LAND lAndExp
+    """
+    if len(p) == 2:
+        p[0] = AST.LOrExpNode(p[1])
+    else:
+        p[0] = AST.LOrExpNode(p[1],p[2],p[3])

@@ -7,6 +7,7 @@ class ASTNode():
     def __init__(self, *childs):
         self.parent = None
         self.child = []
+        self.flag = None
         self.add_child(childs)
 
     def add_child(self, *childs):
@@ -271,7 +272,7 @@ class ElseStmtNode(ASTNode):
 class ForStmtNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(childs)
-
+        self.is_generate = False
 
 class ExpNode(ASTNode):
     def __init__(self, *childs):
