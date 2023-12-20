@@ -4,7 +4,8 @@ import ply.lex as lex
 import ply.yacc as yacc
 import sys
 import token_rules
-import parser
+from token_rules import *
+from parser_rules import *
 start = 'compUnit'
 def print_token(lexer):
     while True:
@@ -21,8 +22,8 @@ def test_file(filename, debug=False, encoding='utf-8'):
     # lexer.input(data)
     # print_token(lexer)
     lexer = lex.lex(module=token_rules, debug=debug)
-    parser1 = yacc.yacc(module=parser,debug=debug)
-    result = parser1.parse()
+    parser1 = yacc.yacc()
+    result = parser1.parse(input=data,lexer=lexer)
     print(result)
 
 
