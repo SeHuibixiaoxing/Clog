@@ -80,6 +80,7 @@ def t_COMMENT(t):
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'ID')
+
     return t
 
 def t_XNOR(t):
