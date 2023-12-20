@@ -1,10 +1,5 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
-Unused terminals:
-
-    BUNDLE
-    EQUAL
-
 Grammar
 
 Rule 0     S' -> compUnit
@@ -27,304 +22,410 @@ Rule 16    constDecl -> CONST val_type constDef constDecl_repeat ;
 Rule 17    cir_basic_type -> REG
 Rule 18    cir_basic_type -> WIRE
 Rule 19    cir_basic_type -> CLOCK
-Rule 20    val_type -> INT
-Rule 21    val_type -> FLOAT
-Rule 22    value_type -> val_type
-Rule 23    value_type -> cir_type
-Rule 24    array -> empty
-Rule 25    array -> [ constExp ] array
-Rule 26    constDef -> ID array ASSIGN constInitVal
-Rule 27    constInitVal_repeat -> empty
-Rule 28    constInitVal_repeat -> , constInitVal constInitVal_repeat
-Rule 29    constInitVal -> constExp
-Rule 30    varDef_repeat -> empty
-Rule 31    varDef_repeat -> , varDef varDef_repeat
-Rule 32    varDecl -> val_type varDef varDef_repeat ;
-Rule 33    varDef -> ID array
-Rule 34    varDef -> ID array ASSIGN initVal
-Rule 35    modDecl -> ID ID ( module_R_params )
-Rule 36    R_port_def -> IN .
-Rule 37    R_port_def -> OUT .
-Rule 38    R_port_def -> INOUT .
-Rule 39    p_module_R_params_item -> R_port_def ID ( ID )
-Rule 40    module_R_params_repeat -> empty
-Rule 41    module_R_params_repeat -> , p_module_R_params_item p_module_R_params_repeat
-Rule 42    module_R_params -> p_module_R_params_item module_R_params_repeat
-Rule 43    bundleDecl_repeat -> empty
-Rule 44    bundleDecl_repeat -> , bundleDef bundleDecl_repeat
-Rule 45    bundleDecl -> ID bundleDef bundleDecl_repeat
-Rule 46    bundleDef -> ID array
-Rule 47    initVal -> exp ;
-Rule 48    cirDecl_repeat -> empty
-Rule 49    cirDecl_repeat -> , cirDef cirDecl_repeat
-Rule 50    cirDecl -> cir_type cirDef p_cirDecl_repeat ;
-Rule 51    cirDef -> ID array
-Rule 52    cirDef -> ID array ASSIGN initVal
-Rule 53    cir_function -> cir_type ID ( cir_funcFParams ) block
-Rule 54    function -> val_type ID ( funcFParams ) block
-Rule 55    cir_funcFParams_repeat -> empty
-Rule 56    cir_funcFParams_repeat -> , cir_funcFParam cir_funcFParams_repeat
-Rule 57    cir_funcFParams -> cir_funcFParam cir_funcFParams_repeat
-Rule 58    funcFParams_repeat -> empty
-Rule 59    funcFParams_repeat -> , funcFParam funcFParams_repeat
-Rule 60    funcFParams -> funcFParam funcFParams_repeat
-Rule 61    cir_funcParam -> type_def ID array
-Rule 62    funcFParam -> val_type ID array
-Rule 63    module_para_para -> empty
-Rule 64    module_para_para -> PARA ID , module_para_para
-Rule 65    p_module_para_port -> empty
-Rule 66    p_module_para_port -> , port_def ID p_module_para_port
-Rule 67    module -> MODULE ID ( module_para_para port_def ID p_module_para_port
-Rule 68    bundle_repeat -> empty
-Rule 69    bundle_repeat -> , cir_type ID bundle bundle_repeat
-Rule 70    bundle -> BUNDULE ID ( cir_type ID p_bundle_repeat )
-Rule 71    block_repeat -> empty
-Rule 72    block_repeat -> blockItem block_repeat
-Rule 73    block -> { block_repeat }
-Rule 74    blockItem -> decl
-Rule 75    blockItem -> stmt
-Rule 76    stmt -> lVal ASSIGN exp ;
-Rule 77    stmt -> lVal CONNECT exp ;
-Rule 78    stmt -> ;
-Rule 79    stmt -> exp
-Rule 80    stmt -> block
-Rule 81    stmt -> seqLogStmt
-Rule 82    stmt -> ifStmt
-Rule 83    stmt -> forStmt
-Rule 84    stmt -> RETURN exp ;
-Rule 85    seqLogStmt -> WHEN ( ID ) stmt
-Rule 86    seqLogStmt -> WHEN ( ID . RISING ) stmt
-Rule 87    seqLogStmt -> WHEN ( ID . FALLING ) stmt
-Rule 88    elifStmt -> ELIF ( exp ) stmt elifStmt
-Rule 89    elifStmt -> empty
-Rule 90    elseStmt -> ELSE stmt
-Rule 91    ifStmt -> IF ( exp ) stmt elifStmt elseStmt
-Rule 92    forStmt -> FOR ( varDecl ; exp ; exp ) stmt
-Rule 93    forStmt -> GENERATE FOR ( varDecl ; exp ; exp ) COLON ID stmt
-Rule 94    exp -> lOrExp
-Rule 95    lVal -> ID array_exp_repeat1
-Rule 96    lVal -> ID array_exp_repreat2
-Rule 97    lVal -> { ID array_exp_repeat1 lVal_repeat }
-Rule 98    lVal -> { ID array_exp_repreat2 lVal_repeat }
-Rule 99    lVal -> MUX ( exp , exp , exp )
-Rule 100   lVal -> lVal . ID
-Rule 101   primaryExp -> ( exp )
-Rule 102   primaryExp -> lVal
-Rule 103   primaryExp -> number
-Rule 104   lVal_repeat -> empty
-Rule 105   lVal_repeat -> , lVal lVal_repeat
-Rule 106   array_exp_repeat1 -> empty
-Rule 107   array_exp_repeat1 -> [ exp ] array_exp_repeat1
-Rule 108   array_exp_repreate2 -> empty
-Rule 109   array_exp_repreate2 -> [ exp COLON exp ] array_exp_repeat2
-Rule 110   number -> INTEGER_CONST
-Rule 111   number -> FLOAT_CONST
-Rule 112   number -> circuit_const
-Rule 113   circuit_const -> exp BIT_WIDTH_NUMBER
-Rule 114   unaryExp -> primaryExp
-Rule 115   unaryExp -> ID ( )
-Rule 116   unaryExp -> ID ( funcRPramas )
-Rule 117   unaryExp -> SIGNAL ( unaryExp )
-Rule 118   unaryExp -> unaryOp unaryExp
-Rule 119   unaryOp -> ADD
-Rule 120   unaryOp -> SUB
-Rule 121   unaryOp -> NOT
-Rule 122   unaryOp -> NOTL
-Rule 123   funcRParmas -> exp
-Rule 124   funcRParmas -> exp exp_repreat
-Rule 125   exp_repeat -> , exp exp_repeat
-Rule 126   mulExp -> unaryExp
-Rule 127   mulExp -> mulExp MUL unaryExp
-Rule 128   mulExp -> mulExp DIV unaryExp
-Rule 129   mulExp -> mulExp MOD unaryExp
-Rule 130   mulExp -> mulExp POWER unaryExp
-Rule 131   addExp -> mulExp
-Rule 132   addExp -> addExp ADD mulExp
-Rule 133   addExp -> addExp SUB mulExp
-Rule 134   shiftExp -> addExp
-Rule 135   shiftExp -> shiftExp SLL addExp
-Rule 136   shiftExp -> shiftExp SRL addExp
-Rule 137   shiftExp -> shiftExp SRA addExp
-Rule 138   relExp -> shiftExp
-Rule 139   relExp -> relExp LT addExp
-Rule 140   relExp -> relExp GT addExp
-Rule 141   relExp -> relExp GE addExp
-Rule 142   relExp -> relExp LE addExp
-Rule 143   eqExp -> relExp
-Rule 144   eqExp -> eqExp LT eqExp
-Rule 145   eqExp -> eqExp GT eqExp
-Rule 146   eqExp -> eqExp GE eqExp
-Rule 147   eqExp -> eqExp LE eqExp
-Rule 148   eqExp -> eqExp EQ eqExp
-Rule 149   eqExp -> eqExp NEQ eqExp
-Rule 150   redExp -> eqExp
-Rule 151   redExp -> AND eqExp
-Rule 152   redExp -> OR eqExp
-Rule 153   redExp -> NOT eqExp
-Rule 154   redExp -> XOR eqExp
-Rule 155   redExp -> XNOR eqExp
-Rule 156   lAndExp -> redExp
-Rule 157   lAndExp -> lAndExp LAND redExp
-Rule 158   lOrExp -> lAndExp
-Rule 159   lOrExp -> lOrExp LOR lAndExp
-Rule 160   cir_type -> REG
-Rule 161   cir_type -> WIRE
-Rule 162   cir_type -> CLOCK
-Rule 163   port_def -> INPUT
-Rule 164   port_def -> OUTPUT
-Rule 165   port_def -> INOUT
+Rule 20    cir_type -> cir_basic_type
+Rule 21    cir_type -> cir_basic_type [ exp ]
+Rule 22    val_type -> INT
+Rule 23    val_type -> FLOAT
+Rule 24    type_def -> val_type
+Rule 25    type_def -> cir_type
+Rule 26    array -> empty
+Rule 27    array -> [ constExp ] array
+Rule 28    constDef -> ID array ASSIGN constInitVal
+Rule 29    constInitVal_repeat -> empty
+Rule 30    constInitVal_repeat -> , constInitVal constInitVal_repeat
+Rule 31    constInitVal -> constExp
+Rule 32    constInitVal -> { constInitVal constInitVal_repeat }
+Rule 33    varDef_repeat -> empty
+Rule 34    varDef_repeat -> , varDef varDef_repeat
+Rule 35    varDecl -> val_type varDef varDef_repeat ;
+Rule 36    varDef -> ID array
+Rule 37    varDef -> ID array ASSIGN initVal
+Rule 38    modDecl -> ID ID ( module_R_params )
+Rule 39    R_port_def -> IN .
+Rule 40    R_port_def -> OUT .
+Rule 41    R_port_def -> INOUT .
+Rule 42    p_module_R_params_item -> R_port_def ID ( ID )
+Rule 43    module_R_params_repeat -> empty
+Rule 44    module_R_params_repeat -> , p_module_R_params_item module_R_params_repeat
+Rule 45    module_R_params -> p_module_R_params_item module_R_params_repeat
+Rule 46    bundleDecl_repeat -> empty
+Rule 47    bundleDecl_repeat -> , bundleDef bundleDecl_repeat
+Rule 48    bundleDecl -> ID bundleDef bundleDecl_repeat
+Rule 49    bundleDef -> ID array
+Rule 50    initVal -> exp ;
+Rule 51    cirDecl_repeat -> empty
+Rule 52    cirDecl_repeat -> , cirDef cirDecl_repeat
+Rule 53    cirDecl -> cir_type cirDef cirDecl_repeat ;
+Rule 54    cirDef -> ID array
+Rule 55    cirDef -> ID array ASSIGN initVal
+Rule 56    cir_function -> cir_type ID ( cir_funcFParams ) block
+Rule 57    function -> val_type ID ( funcFParams ) block
+Rule 58    cir_funcFParams_repeat -> empty
+Rule 59    cir_funcFParams_repeat -> , cir_funcFParam cir_funcFParams_repeat
+Rule 60    cir_funcFParams -> cir_funcFParam cir_funcFParams_repeat
+Rule 61    funcFParams_repeat -> empty
+Rule 62    funcFParams_repeat -> , funcFParam funcFParams_repeat
+Rule 63    funcFParams -> funcFParam funcFParams_repeat
+Rule 64    cir_funcFParam -> type_def ID array
+Rule 65    funcFParam -> val_type ID array
+Rule 66    module_para_para -> empty
+Rule 67    module_para_para -> PARA ID , module_para_para
+Rule 68    p_module_para_port -> empty
+Rule 69    p_module_para_port -> , port_def ID p_module_para_port
+Rule 70    module -> MODULE ID ( module_para_para port_def ID p_module_para_port
+Rule 71    bundle_repeat -> empty
+Rule 72    bundle_repeat -> , cir_type ID bundle bundle_repeat
+Rule 73    bundle -> BUNDLE ID ( cir_type ID bundle_repeat )
+Rule 74    block_repeat -> empty
+Rule 75    block_repeat -> blockItem block_repeat
+Rule 76    block -> { block_repeat }
+Rule 77    blockItem -> decl
+Rule 78    blockItem -> stmt
+Rule 79    stmt -> lVal ASSIGN exp ;
+Rule 80    stmt -> lVal CONNECT exp ;
+Rule 81    stmt -> ;
+Rule 82    stmt -> exp
+Rule 83    stmt -> block
+Rule 84    stmt -> seqLogStmt
+Rule 85    stmt -> ifStmt
+Rule 86    stmt -> forStmt
+Rule 87    stmt -> RETURN exp ;
+Rule 88    seqLogStmt -> WHEN ( ID ) stmt
+Rule 89    seqLogStmt -> WHEN ( ID . RISING ) stmt
+Rule 90    seqLogStmt -> WHEN ( ID . FALLING ) stmt
+Rule 91    elifStmt -> ELIF ( exp ) stmt elifStmt
+Rule 92    elifStmt -> empty
+Rule 93    elseStmt -> ELSE stmt
+Rule 94    ifStmt -> IF ( exp ) stmt elifStmt elseStmt
+Rule 95    forStmt -> FOR ( varDecl ; exp ; exp ) stmt
+Rule 96    forStmt -> GENERATE FOR ( varDecl ; exp ; exp ) COLON ID stmt
+Rule 97    exp -> lOrExp
+Rule 98    lVal -> ID array_exp_repeat1
+Rule 99    lVal -> ID array_exp_repeat2
+Rule 100   lVal -> { ID array_exp_repeat1 lVal_repeat }
+Rule 101   lVal -> { ID array_exp_repeat2 lVal_repeat }
+Rule 102   lVal -> MUX ( exp , exp , exp )
+Rule 103   lVal -> lVal . ID
+Rule 104   primaryExp -> ( exp )
+Rule 105   primaryExp -> lVal
+Rule 106   primaryExp -> number
+Rule 107   lVal_repeat -> empty
+Rule 108   lVal_repeat -> , lVal lVal_repeat
+Rule 109   array_exp_repeat1 -> empty
+Rule 110   array_exp_repeat1 -> [ exp ] array_exp_repeat1
+Rule 111   array_exp_repeat2 -> empty
+Rule 112   array_exp_repeat2 -> [ exp COLON exp ] array_exp_repeat2
+Rule 113   number -> INTEGER_CONST
+Rule 114   number -> FLOAT_CONST
+Rule 115   number -> circuit_const
+Rule 116   circuit_const -> exp BIT_WIDTH_NUMBER
+Rule 117   unaryExp -> primaryExp
+Rule 118   unaryExp -> ID ( )
+Rule 119   unaryExp -> ID ( funcRParams )
+Rule 120   unaryExp -> SIGNAL ( unaryExp )
+Rule 121   unaryExp -> unaryOp unaryExp
+Rule 122   unaryOp -> ADD
+Rule 123   unaryOp -> SUB
+Rule 124   unaryOp -> NOT
+Rule 125   unaryOp -> NOTL
+Rule 126   exp_repeat -> empty
+Rule 127   exp_repeat -> , exp exp_repeat
+Rule 128   funcRParams -> exp
+Rule 129   funcRParams -> exp exp_repeat
+Rule 130   mulExp -> unaryExp
+Rule 131   mulExp -> mulExp MUL unaryExp
+Rule 132   mulExp -> mulExp DIV unaryExp
+Rule 133   mulExp -> mulExp MOD unaryExp
+Rule 134   mulExp -> mulExp POWER unaryExp
+Rule 135   addExp -> mulExp
+Rule 136   addExp -> addExp ADD mulExp
+Rule 137   addExp -> addExp SUB mulExp
+Rule 138   shiftExp -> addExp
+Rule 139   shiftExp -> shiftExp SLL addExp
+Rule 140   shiftExp -> shiftExp SRL addExp
+Rule 141   shiftExp -> shiftExp SRA addExp
+Rule 142   relExp -> shiftExp
+Rule 143   relExp -> relExp LT addExp
+Rule 144   relExp -> relExp GT addExp
+Rule 145   relExp -> relExp GE addExp
+Rule 146   relExp -> relExp LE addExp
+Rule 147   eqExp -> relExp
+Rule 148   eqExp -> eqExp LT eqExp
+Rule 149   eqExp -> eqExp GT eqExp
+Rule 150   eqExp -> eqExp GE eqExp
+Rule 151   eqExp -> eqExp LE eqExp
+Rule 152   eqExp -> eqExp EQUAL eqExp
+Rule 153   eqExp -> eqExp NEQ eqExp
+Rule 154   redExp -> eqExp
+Rule 155   redExp -> AND eqExp
+Rule 156   redExp -> OR eqExp
+Rule 157   redExp -> NOT eqExp
+Rule 158   redExp -> XOR eqExp
+Rule 159   redExp -> XNOR eqExp
+Rule 160   lAndExp -> redExp
+Rule 161   lAndExp -> lAndExp LAND redExp
+Rule 162   lOrExp -> lAndExp
+Rule 163   lOrExp -> lOrExp LOR lAndExp
+Rule 164   port_def -> INPUT
+Rule 165   port_def -> OUTPUT
+Rule 166   port_def -> INOUT
+Rule 167   constExp -> exp
 
 Terminals, with rules where they appear
 
-(                    : 35 39 53 54 67 70 85 86 87 88 91 92 93 99 101 115 116 117
-)                    : 35 39 53 54 70 85 86 87 88 91 92 93 99 101 115 116 117
-,                    : 15 28 31 41 44 49 56 59 64 66 69 99 99 105 125
-.                    : 36 37 38 86 87 100
-;                    : 16 32 47 50 76 77 78 84 92 92 93 93
-ADD                  : 119 132
-AND                  : 151
-ASSIGN               : 26 34 52 76
-BIT_WIDTH_NUMBER     : 113
-BUNDLE               : 
-CLOCK                : 19 162
-COLON                : 93 109
-CONNECT              : 77
+(                    : 38 42 56 57 70 73 88 89 90 91 94 95 96 102 104 118 119 120
+)                    : 38 42 56 57 73 88 89 90 91 94 95 96 102 104 118 119 120
+,                    : 15 30 34 44 47 52 59 62 67 69 72 102 102 108 127
+.                    : 39 40 41 89 90 103
+;                    : 16 35 50 53 79 80 81 87 95 95 96 96
+ADD                  : 122 136
+AND                  : 155
+ASSIGN               : 28 37 55 79
+BIT_WIDTH_NUMBER     : 116
+BUNDLE               : 73
+CLOCK                : 19
+COLON                : 96 112
+CONNECT              : 80
 CONST                : 16
-DIV                  : 128
-ELIF                 : 88
-ELSE                 : 90
-EQUAL                : 
-FALLING              : 87
-FLOAT                : 21
-FLOAT_CONST          : 111
-FOR                  : 92 93
-GE                   : 141 146
-GENERATE             : 93
-GT                   : 140 145
-ID                   : 26 33 34 35 35 39 39 45 46 51 52 53 54 61 62 64 66 67 67 69 70 70 85 86 87 93 95 96 97 98 100 115 116
-IF                   : 91
-IN                   : 36
-INOUT                : 38 165
-INPUT                : 163
-INT                  : 20
-INTEGER_CONST        : 110
-LAND                 : 157
-LE                   : 142 147
-LOR                  : 159
-LT                   : 139 144
-MOD                  : 129
-MODULE               : 67
-MUL                  : 127
-MUX                  : 99
-NEQ                  : 149
-NOT                  : 121 153
-NOTL                 : 122
-OR                   : 152
-OUT                  : 37
-OUTPUT               : 164
-PARA                 : 64
-POWER                : 130
-REG                  : 17 160
-RETURN               : 84
-RISING               : 86
-SIGNAL               : 117
-SLL                  : 135
-SRA                  : 137
-SRL                  : 136
-SUB                  : 120 133
-WHEN                 : 85 86 87
-WIRE                 : 18 161
-XNOR                 : 155
-XOR                  : 154
-[                    : 25 107 109
-]                    : 25 107 109
+DIV                  : 132
+ELIF                 : 91
+ELSE                 : 93
+EQUAL                : 152
+FALLING              : 90
+FLOAT                : 23
+FLOAT_CONST          : 114
+FOR                  : 95 96
+GE                   : 145 150
+GENERATE             : 96
+GT                   : 144 149
+ID                   : 28 36 37 38 38 42 42 48 49 54 55 56 57 64 65 67 69 70 70 72 73 73 88 89 90 96 98 99 100 101 103 118 119
+IF                   : 94
+IN                   : 39
+INOUT                : 41 166
+INPUT                : 164
+INT                  : 22
+INTEGER_CONST        : 113
+LAND                 : 161
+LE                   : 146 151
+LOR                  : 163
+LT                   : 143 148
+MOD                  : 133
+MODULE               : 70
+MUL                  : 131
+MUX                  : 102
+NEQ                  : 153
+NOT                  : 124 157
+NOTL                 : 125
+OR                   : 156
+OUT                  : 40
+OUTPUT               : 165
+PARA                 : 67
+POWER                : 134
+REG                  : 17
+RETURN               : 87
+RISING               : 89
+SIGNAL               : 120
+SLL                  : 139
+SRA                  : 141
+SRL                  : 140
+SUB                  : 123 137
+WHEN                 : 88 89 90
+WIRE                 : 18
+XNOR                 : 159
+XOR                  : 158
+[                    : 21 27 110 112
+]                    : 21 27 110 112
 error                : 
-{                    : 73 97 98
-}                    : 73 97 98
+{                    : 32 76 100 101
+}                    : 32 76 100 101
 
 Nonterminals, with rules where they appear
 
-BUNDULE              : 70
-EQ                   : 148
-R_port_def           : 39
-addExp               : 132 133 134 135 136 137 139 140 141 142
-array                : 25 26 33 34 46 51 52 61 62
-array_exp_repeat1    : 95 97 107
-array_exp_repeat2    : 109
-array_exp_repreat2   : 96 98
-array_exp_repreate2  : 
-block                : 53 54 80
-blockItem            : 72
-block_repeat         : 72 73
-bundle               : 8 69
+R_port_def           : 42
+addExp               : 136 137 138 139 140 141 143 144 145 146
+array                : 27 28 36 37 49 54 55 64 65
+array_exp_repeat1    : 98 100 110
+array_exp_repeat2    : 99 101 112
+block                : 56 57 83
+blockItem            : 75
+block_repeat         : 75 76
+bundle               : 8 72
 bundleDecl           : 13
-bundleDecl_repeat    : 44 45
-bundleDef            : 44 45
-bundle_repeat        : 69
+bundleDecl_repeat    : 47 48
+bundleDef            : 47 48
+bundle_repeat        : 72 73
 cirDecl              : 11
-cirDecl_repeat       : 49
-cirDef               : 49 50
-cir_basic_type       : 
-cir_funcFParam       : 56 57
-cir_funcFParams      : 53
-cir_funcFParams_repeat : 56 57
-cir_funcParam        : 
+cirDecl_repeat       : 52 53
+cirDef               : 52 53
+cir_basic_type       : 20 21
+cir_funcFParam       : 59 60
+cir_funcFParams      : 56
+cir_funcFParams_repeat : 59 60
 cir_function         : 5
-cir_type             : 23 50 53 69 70
-circuit_const        : 112
+cir_type             : 25 53 56 72 73
+circuit_const        : 115
 compUnit             : 3 3 0
 constDecl            : 9
 constDecl_repeat     : 15 16
 constDef             : 15 16
-constExp             : 25 29
-constInitVal         : 26 28
-constInitVal_repeat  : 28
-decl                 : 4 74
-elifStmt             : 88 91
-elseStmt             : 91
-empty                : 2 14 24 27 30 40 43 48 55 58 63 65 68 71 89 104 106 108
-eqExp                : 144 144 145 145 146 146 147 147 148 148 149 149 150 151 152 153 154 155
-exp                  : 47 76 77 79 84 88 91 92 92 93 93 99 99 99 101 107 109 109 113 123 124 125
-exp_repeat           : 125
-exp_repreat          : 124
-forStmt              : 83
-funcFParam           : 59 60
-funcFParams          : 54
-funcFParams_repeat   : 59 60
-funcRParmas          : 
-funcRPramas          : 116
+constExp             : 27 31
+constInitVal         : 28 30 32
+constInitVal_repeat  : 30 32
+decl                 : 4 77
+elifStmt             : 91 94
+elseStmt             : 94
+empty                : 2 14 26 29 33 43 46 51 58 61 66 68 71 74 92 107 109 111 126
+eqExp                : 148 148 149 149 150 150 151 151 152 152 153 153 154 155 156 157 158 159
+exp                  : 21 50 79 80 82 87 91 94 95 95 96 96 102 102 102 104 110 112 112 116 127 128 129 167
+exp_repeat           : 127 129
+forStmt              : 86
+funcFParam           : 62 63
+funcFParams          : 57
+funcFParams_repeat   : 62 63
+funcRParams          : 119
 function             : 6
-ifStmt               : 82
-initVal              : 34 52
-lAndExp              : 157 158 159
-lOrExp               : 94 159
-lVal                 : 76 77 100 102 105
-lVal_repeat          : 97 98 105
+ifStmt               : 85
+initVal              : 37 55
+lAndExp              : 161 162 163
+lOrExp               : 97 163
+lVal                 : 79 80 103 105 108
+lVal_repeat          : 100 101 108
 modDecl              : 12
 module               : 7
-module_R_params      : 35
-module_R_params_repeat : 42
-module_para_para     : 64 67
-mulExp               : 127 128 129 130 131 132 133
-number               : 103
-p_bundle_repeat      : 70
-p_cirDecl_repeat     : 50
-p_module_R_params_item : 41 42
-p_module_R_params_repeat : 41
-p_module_para_port   : 66 67
-port_def             : 66 67
-primaryExp           : 114
-redExp               : 156 157
-relExp               : 139 140 141 142 143
-seqLogStmt           : 81
-shiftExp             : 135 136 137 138
-stmt                 : 75 85 86 87 88 90 91 92 93
-type_def             : 61
-unaryExp             : 117 118 126 127 128 129 130
-unaryOp              : 118
-val_type             : 16 22 32 54 62
-value_type           : 
-varDecl              : 10 92 93
-varDef               : 31 32
-varDef_repeat        : 31 32
+module_R_params      : 38
+module_R_params_repeat : 44 45
+module_para_para     : 67 70
+mulExp               : 131 132 133 134 135 136 137
+number               : 106
+p_module_R_params_item : 44 45
+p_module_para_port   : 69 70
+port_def             : 69 70
+primaryExp           : 117
+redExp               : 160 161
+relExp               : 143 144 145 146 147
+seqLogStmt           : 84
+shiftExp             : 139 140 141 142
+stmt                 : 78 88 89 90 91 93 94 95 96
+type_def             : 64
+unaryExp             : 120 121 130 131 132 133 134
+unaryOp              : 121
+val_type             : 16 24 35 57 65
+varDecl              : 10 95 96
+varDef               : 34 35
+varDef_repeat        : 34 35
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . compUnit
+    (2) compUnit -> . empty
+    (3) compUnit -> . compUnit compUnit
+    (4) compUnit -> . decl
+    (5) compUnit -> . cir_function
+    (6) compUnit -> . function
+    (7) compUnit -> . module
+    (8) compUnit -> . bundle
+    (1) empty -> .
+    (9) decl -> . constDecl
+    (10) decl -> . varDecl
+    (11) decl -> . cirDecl
+    (12) decl -> . modDecl
+    (13) decl -> . bundleDecl
+    (56) cir_function -> . cir_type ID ( cir_funcFParams ) block
+    (57) function -> . val_type ID ( funcFParams ) block
+    (70) module -> . MODULE ID ( module_para_para port_def ID p_module_para_port
+    (73) bundle -> . BUNDLE ID ( cir_type ID bundle_repeat )
+    (16) constDecl -> . CONST val_type constDef constDecl_repeat ;
+    (35) varDecl -> . val_type varDef varDef_repeat ;
+    (53) cirDecl -> . cir_type cirDef cirDecl_repeat ;
+    (38) modDecl -> . ID ID ( module_R_params )
+    (48) bundleDecl -> . ID bundleDef bundleDecl_repeat
+    (20) cir_type -> . cir_basic_type
+    (21) cir_type -> . cir_basic_type [ exp ]
+    (22) val_type -> . INT
+    (23) val_type -> . FLOAT
+    (17) cir_basic_type -> . REG
+    (18) cir_basic_type -> . WIRE
+    (19) cir_basic_type -> . CLOCK
+
+  ! shift/reduce conflict for MODULE resolved as shift
+  ! shift/reduce conflict for BUNDLE resolved as shift
+  ! shift/reduce conflict for CONST resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for INT resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for REG resolved as shift
+  ! shift/reduce conflict for WIRE resolved as shift
+  ! shift/reduce conflict for CLOCK resolved as shift
+    $end            reduce using rule 1 (empty -> .)
+    MODULE          shift and go to state 16
+    BUNDLE          shift and go to state 17
+    CONST           shift and go to state 18
+    ID              shift and go to state 14
+    INT             shift and go to state 20
+    FLOAT           shift and go to state 21
+    REG             shift and go to state 22
+    WIRE            shift and go to state 23
+    CLOCK           shift and go to state 24
+
+  ! MODULE          [ reduce using rule 1 (empty -> .) ]
+  ! BUNDLE          [ reduce using rule 1 (empty -> .) ]
+  ! CONST           [ reduce using rule 1 (empty -> .) ]
+  ! ID              [ reduce using rule 1 (empty -> .) ]
+  ! INT             [ reduce using rule 1 (empty -> .) ]
+  ! FLOAT           [ reduce using rule 1 (empty -> .) ]
+  ! REG             [ reduce using rule 1 (empty -> .) ]
+  ! WIRE            [ reduce using rule 1 (empty -> .) ]
+  ! CLOCK           [ reduce using rule 1 (empty -> .) ]
+
+    compUnit                       shift and go to state 1
+    empty                          shift and go to state 2
+    decl                           shift and go to state 3
+    cir_function                   shift and go to state 4
+    function                       shift and go to state 5
+    module                         shift and go to state 6
+    bundle                         shift and go to state 7
+    constDecl                      shift and go to state 8
+    varDecl                        shift and go to state 9
+    cirDecl                        shift and go to state 10
+    modDecl                        shift and go to state 11
+    bundleDecl                     shift and go to state 12
+    cir_type                       shift and go to state 13
+    val_type                       shift and go to state 15
+    cir_basic_type                 shift and go to state 19
+
+state 1
+
+    (0) S' -> compUnit .
+    (3) compUnit -> compUnit . compUnit
+    (2) compUnit -> . empty
+    (3) compUnit -> . compUnit compUnit
+    (4) compUnit -> . decl
+    (5) compUnit -> . cir_function
+    (6) compUnit -> . function
+    (7) compUnit -> . module
+    (8) compUnit -> . bundle
+    (1) empty -> .
+    (9) decl -> . constDecl
+    (10) decl -> . varDecl
+    (11) decl -> . cirDecl
+    (12) decl -> . modDecl
+    (13) decl -> . bundleDecl
+    (56) cir_function -> . cir_type ID ( cir_funcFParams ) block
+    (57) function -> . val_type ID ( funcFParams ) block
+    (70) module -> . MODULE ID ( module_para_para port_def ID p_module_para_port
+    (73) bundle -> . BUNDLE ID ( cir_type ID bundle_repeat )
+    (16) constDecl -> . CONST val_type constDef constDecl_repeat ;
+    (35) varDecl -> . val_type varDef varDef_repeat ;
+    (53) cirDecl -> . cir_type cirDef cirDecl_repeat ;
+    (38) modDecl -> . ID ID ( module_R_params )
+    (48) bundleDecl -> . ID bundleDef bundleDecl_repeat
+    (20) cir_type -> . cir_basic_type
+    (21) cir_type -> . cir_basic_type [ exp ]
+    (22) val_type -> . INT
+    (23) val_type -> . FLOAT
+    (17) cir_basic_type -> . REG
+    (18) cir_basic_type -> . WIRE
+    (19) cir_basic_type -> . CLOCK
 

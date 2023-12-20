@@ -61,7 +61,7 @@ def p_cir_basic_type(p):
     p[0].type = p[1]
 
 def p_cir_type(p):
-    """cir_type : cir_basic_tyoe
+    """cir_type : cir_basic_type
                 | cir_basic_type '[' exp ']'"""
     p[0] = AST.CirTypeNode()
     p[0].type = p[1]
@@ -78,8 +78,8 @@ def p_val_type(p):
 
 
 def p_type_def(p):
-    """value_type : val_type
-                  | cir_type"""
+    """type_def : val_type
+                | cir_type"""
 
     p[0] = AST.TypeDefNode(p[1])
 
@@ -108,8 +108,13 @@ def p_constInitVal_repeat(p):
 
 
 def p_constInitVal(p):
-    """constInitVal : constExp"""
-    p[0] = AST.ConstInitValNode(p[1])
+    """constInitVal : constExp
+                    | '{' constInitVal constInitVal_repeat '}'"""
+    if len(p) == 2:
+        p[0] = AST.ConstInitValNode(p[1])
+    elif len(p) == 5:
+        p[0] = AST.ConstInitValNode(p[2])
+        p[0].merge(p[3])
 
 
 def p_varDef_repeat(p):
@@ -161,7 +166,7 @@ def p_module_R_params_item(p):
 
 def p_module_R_params_repeat(p):
     """module_R_params_repeat : empty
-                              | ','  p_module_R_params_item p_module_R_params_repeat"""
+                              | ','  p_module_R_params_item module_R_params_repeat"""
     p[0] = AST.ASTNode()
     if len(p) == 8:
         p[0].add_child(p[2])
@@ -210,7 +215,7 @@ def p_cirDecl_repeat(p):
         p[0].merge(p[3])
 
 def p_cirDecl(p):
-    """cirDecl : cir_type cirDef p_cirDecl_repeat ';'"""
+    """cirDecl : cir_type cirDef cirDecl_repeat ';'"""
     p[0] = AST.CirDeclNode(p[1], p[2], p[3])
 
 
@@ -268,7 +273,7 @@ def p_funcFParams(p):
 
 
 def p_cir_funcFParam(p):
-    """cir_funcParam : type_def ID array"""
+    """cir_funcFParam : type_def ID array"""
     p[0]  =AST.CirFuncFParamNode(p[1])
     p[0].name = p[2]
 
@@ -325,7 +330,7 @@ def p_bundle_repeat(p):
         p[0].merge(p[5])
 
 def p_bundle(p):
-    """bundle : BUNDULE ID '(' cir_type ID p_bundle_repeat ')'"""
+    """bundle : BUNDLE ID '(' cir_type ID bundle_repeat ')'"""
 
     tmp = AST.BundleParaNode()
     tmp.name = p[5]
@@ -433,9 +438,9 @@ def p_exp(p):
 def p_lVal(p):
     """
     lVal : ID array_exp_repeat1
-        | ID array_exp_repreat2
+        | ID array_exp_repeat2
         | '{' ID array_exp_repeat1 lVal_repeat '}'
-        | '{' ID array_exp_repreat2 lVal_repeat '}'
+        | '{' ID array_exp_repeat2 lVal_repeat '}'
         | MUX '(' exp ',' exp ',' exp ')'
         | lVal '.' ID
     """
@@ -482,9 +487,9 @@ def p_array_exp_repeat1(p):
         p[0].merge(p[4])
     p[0].flag = 'repeat_1'
 
-def p_array_exp_repreate2(p):
+def p_array_exp_repeat2(p):
     """
-    array_exp_repreate2 : empty
+    array_exp_repeat2 : empty
                         | '[' exp COLON exp ']' array_exp_repeat2
     """
     p[0] = AST.ASTNode()
@@ -510,7 +515,7 @@ def p_unaryExp(p):
     """
     unaryExp : primaryExp
                 | ID '(' ')'
-                | ID '(' funcRPramas ')'
+                | ID '(' funcRParams ')'
                 | SIGNAL '(' unaryExp ')'
                 | unaryOp unaryExp
     """
@@ -538,23 +543,31 @@ def p_unaryOp(p):
     """
     p[0] = AST.UnaryOpNode(p[1])
 
+
+def p_exp_repeat(p):
+    """
+    exp_repeat : empty
+               | ',' exp exp_repeat
+    """
+
+    p[0] = AST.ASTNode()
+    if len(p) == 4:
+        p[0].add_children(p[2])
+        p[0].merge(p[3])
+        p[0].flag = 'exp repeat'
+
+
 def p_funcRParams(p):
     """
-    funcRParmas : exp
-                | exp exp_repreat
+    funcRParams : exp
+                | exp exp_repeat
     """
     if len(p) == 2:
         p[0].add_children(p[1])
     else:
         p[0].add_children(p[1],p[2])
-def p_exp_repeat(p):
-    """
-    exp_repeat : ',' exp exp_repeat
-    """
-    p[0] = AST.ASTNode()
-    p[0].add_children(p[2])
-    p[0].merge(p[3])
-    p[0].flag = 'exp repeat'
+
+
 
 def p_mulExp(p):
     """
@@ -614,7 +627,7 @@ def p_eqExp(p):
             | eqExp GT eqExp
             | eqExp GE eqExp
             | eqExp LE eqExp
-            | eqExp EQ eqExp
+            | eqExp EQUAL eqExp
             | eqExp NEQ eqExp
     """
     if len(p) == 2:
@@ -657,14 +670,13 @@ def p_lOrExp(p):
     else:
         p[0] = AST.LOrExpNode(p[1],p[2],p[3])
 
-def p_cir_type(p):
-    """cir_type : REG
-                | WIRE
-                | CLOCK"""
-    p[0] = AST.CirTypeNode(p[1])
 
 def p_port_def(p):
     """port_def : INPUT
                 | OUTPUT
                 | INOUT"""
     p[0] = AST.PortDefNode(p[1])
+
+def p_constExp(p):
+    """constExp : exp"""
+    pass
