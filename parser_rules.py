@@ -131,7 +131,7 @@ def p_varDef(p):
 
 
 def p_modDecl(p):
-    """modDecl : ID ID '( module_R_params ')"""
+    """modDecl : ID ID '(' module_R_params ')'"""
     p[0] = AST.ModDeclNode(p[4])
     p[0].type = p[1]
     p[0].name = p[2]
@@ -169,7 +169,7 @@ def p_module_R_params(p):
 
 def p_bundleDecl_repeat(p):
     """bundleDecl_repeat : empty
-                         : ',' bundleDef bundleDecl_repeat"""
+                         | ',' bundleDef bundleDecl_repeat"""
     p[0] = AST.ASTNode()
     if len(p) == 4:
         p[0].add_child(p[2])
@@ -273,7 +273,7 @@ def p_funcFParam(p):
 
 def p_module_para_para(p):
     """module_para_para : empty
-                   | 'PARA' ID ',' module_para_para"""
+                   | PARA ID ',' module_para_para"""
     p[0] = AST.ASTNode()
     if len(p) == 5:
         tmp = AST.ModuleParaParaNode()
@@ -350,7 +350,7 @@ def p_stmt(p):
         p[0].add_child(p[1], p[3])
 
 def p_seqLogStmt(p):
-    """seqLogStmt : WHEN '(' ID ') stmt
+    """seqLogStmt : WHEN '(' ID ')' stmt
                   | WHEN '(' ID '.' RISING ')' stmt
                   | WHEN '(' ID '.' FALLING ')' stmt"""
     p[0] = AST.SeqLogStmtNode()
@@ -385,8 +385,8 @@ def p_ifStmt(p):
 
 def p_forStmt(p):
     """
-     forStmt : FOR '(' varDecl ';' exp ; exp ')' stmt
-            | GENERATE FOR '(' varDecl ';' exp ; exp ')' ':' ID stmt
+     forStmt : FOR '(' varDecl ';' exp ';' exp ')' stmt
+            | GENERATE FOR '(' varDecl ';' exp ';' exp ')' ':' ID stmt
     """
     if p[1] == "generate":
         p[0] = AST.ForStmtNode(p[4], p[6], p[8], p[11],p[12])
@@ -406,7 +406,7 @@ def p_lVal(p):
         | ID array_exp_repreat2
         | '{' ID array_exp_repeat1 lVal_repeat '}'
         | '{' ID array_exp_repreat2 lVal_repeat '}'
-        | 'MUX' '(' exp ',' exp ',' exp ')'
+        | MUX '(' exp ',' exp ',' exp ')'
         | lVal '.' ID
     """
     p[0] = AST.LValNode()
@@ -421,7 +421,9 @@ def p_lVal(p):
 
 def p_primaryExp(p):
     """
-    primaryExp : '(' exp ')'| lVal | number
+    primaryExp : '(' exp ')'
+            | lVal
+            | number
     """
     if len(p) == 4:
         p[0] = AST.PrimaryExpNode(p[2])
@@ -463,7 +465,9 @@ def p_array_exp_repreate2(p):
 
 def p_number(p):
     """
-    number : INTEGER_CONST | FLOAT_CONST | circuit_const
+    number : INTEGER_CONST
+    | FLOAT_CONST
+    | circuit_const
     """
     p[0] = p[1]
 def p_circuit_const(p):
@@ -475,10 +479,10 @@ def p_circuit_const(p):
 def p_unaryExp(p):
     """
     unaryExp : primaryExp
-                |ID '(' ')'
-                |ID '(' funcRPramas ')'
-                |SIGNAL '(' unaryExp ')'
-                |unaryOp unaryExp
+                | ID '(' ')'
+                | ID '(' funcRPramas ')'
+                | SIGNAL '(' unaryExp ')'
+                | unaryOp unaryExp
     """
     if len(p) == 2:
         p[0] = p[1]
@@ -497,7 +501,10 @@ def p_unaryExp(p):
 
 def p_unaryOp(p):
     """
-    unaryOp : ADD|SUB|NOT|NOTL
+    unaryOp : ADD
+    | SUB
+    | NOT
+    | NOTL
     """
     p[0] = AST.UnaryOpNode(p[1])
 
