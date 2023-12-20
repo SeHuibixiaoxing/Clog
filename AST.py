@@ -129,6 +129,19 @@ class ModuleRParams(ASTNode):
     def __init__(self, *childs):
         super().__init__(childs)
 
+class BundleParaNode(ASTNode):
+    def __init__(self, *childs):
+        super().__init__(childs)
+
+        self.name = ""
+        self.type = ""
+
+class BundleNode(ASTNode):
+    def __init__(self, *childs):
+        super().__init__(childs)
+
+        self.name = ""
+
 
 class BundleDeclNode(ASTNode):
     # child[0]: BundleRParams
@@ -373,6 +386,11 @@ class BinaryConstNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(childs)
 
+class CirBasicTypeNode(ASTNode):
+    def __init__(self, *childs):
+        super().__init__(childs)
+
+        self.type = ""
 
 class CirTypeNode(ASTNode):
     def __init__(self, *childs):

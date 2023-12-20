@@ -39,8 +39,8 @@ def p_comp_decl(p):
 
 
 def p_constDecl_repeat(p):
-    """constDef_repeat : empty
-                        | ',' comseDef constDef_repeat"""
+    """constDecl_repeat : empty
+                        | ',' constDef constDecl_repeat"""
     p[0] = AST.ConstDeclNode()
     if len(p) == 4:
         p[0].add_child(p[2])
@@ -53,13 +53,20 @@ def p_constDecl(p):
     p[0].merge(p[4])
 
 
-def p_cir_type(p):
-    """cir_type : REG
-                | WIRE
-                | CLOCK"""
+def p_cir_basic_type(p):
+    """cir_basic_type : REG
+                      | WIRE
+                      | CLOCK"""
+    p[0] = AST.CirBasicTypeNode()
+    p[0].type = p[1]
 
+def p_cir_type(p):
+    """cir_type : cir_basic_tyoe
+                | cir_basic_type '[' exp ']'"""
     p[0] = AST.CirTypeNode()
     p[0].type = p[1]
+    if len(p) == 5:
+        p[0].add_child(p[3])
 
 
 def p_val_type(p):
@@ -306,6 +313,29 @@ def p_module(p):
 
     p[0].name = p[2]
 
+def p_bundle_repeat(p):
+    """bundle_repeat : empty
+                      | ',' cir_type ID bundle bundle_repeat"""
+    p[0] = AST.ASTNode()
+    if len(p) == 6:
+        tmp = AST.BundleParaNode()
+        tmp.name = p[3]
+        tmp.type = p[2]
+        p[0].add_child(tmp)
+        p[0].merge(p[5])
+
+def p_bundle(p):
+    """bundle : BUNDULE ID '(' cir_type ID p_bundle_repeat ')'"""
+
+    tmp = AST.BundleParaNode()
+    tmp.name = p[5]
+    tmp.type = p[4]
+
+    p[0] = AST.BundleNode(tmp)
+    p[0].merge(p[6])
+    p[0].name = p[2]
+
+
 def p_block_repeat(p):
     """block_repeat : empty
                     | blockItem block_repeat"""
@@ -386,7 +416,7 @@ def p_ifStmt(p):
 def p_forStmt(p):
     """
      forStmt : FOR '(' varDecl ';' exp ';' exp ')' stmt
-            | GENERATE FOR '(' varDecl ';' exp ';' exp ')' ':' ID stmt
+            | GENERATE FOR '(' varDecl ';' exp ';' exp ')' COLON ID stmt
     """
     if p[1] == "generate":
         p[0] = AST.ForStmtNode(p[4], p[6], p[8], p[11],p[12])
@@ -455,7 +485,7 @@ def p_array_exp_repeat1(p):
 def p_array_exp_repreate2(p):
     """
     array_exp_repreate2 : empty
-                        | '[' exp ':' exp ']' array_exp_repeat2
+                        | '[' exp COLON exp ']' array_exp_repeat2
     """
     p[0] = AST.ASTNode()
     if len(p) == 7:
@@ -584,11 +614,13 @@ def p_eqExp(p):
             | eqExp GT eqExp
             | eqExp GE eqExp
             | eqExp LE eqExp
+            | eqExp EQ eqExp
+            | eqExp NEQ eqExp
     """
     if len(p) == 2:
         p[0] = AST.EqExpNode(p[1])
     else:
-        p[0] = AST.EqExpNode(p[1],p[2],p[3])
+        p[0] = AST.EqExpNode(p[1], p[2], p[3])
 
 def p_redExp(p):
     """
@@ -618,9 +650,21 @@ def p_lAndExp(p):
 def p_lOrExp(p):
     """
     lOrExp : lAndExp
-            | lOrExp LAND lAndExp
+            | lOrExp LOR lAndExp
     """
     if len(p) == 2:
         p[0] = AST.LOrExpNode(p[1])
     else:
         p[0] = AST.LOrExpNode(p[1],p[2],p[3])
+
+def p_cir_type(p):
+    """cir_type : REG
+                | WIRE
+                | CLOCK"""
+    p[0] = AST.CirTypeNode(p[1])
+
+def p_port_def(p):
+    """port_def : INPUT
+                | OUTPUT
+                | INOUT"""
+    p[0] = AST.PortDefNode(p[1])
