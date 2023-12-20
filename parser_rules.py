@@ -675,6 +675,7 @@ def p_port_def(p):
     """port_def : INPUT
                 | OUTPUT
                 | INOUT"""
+    print(p[1])
     p[0] = AST.PortDefNode(p[1])
 
 def p_constExp(p):

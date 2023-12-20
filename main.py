@@ -23,7 +23,7 @@ def test_file(filename, debug=False, encoding='utf-8'):
     # print_token(lexer)
     lexer = lex.lex(module=token_rules, debug=debug)
     parser1 = yacc.yacc()
-    result = parser1.parse(input=data,lexer=lexer)
+    result = parser1.parse(input=data, lexer=lexer)
     print(result)
 
 
@@ -49,8 +49,7 @@ def test_lexer_all(debug=False):
     test_lexer_regfile(debug)
     test_lexer_tools(debug)
 
-def lexer_main():
-    debug = False
+def lexer_main(debug = False):
 
     for i in range(1, len(sys.argv)):
         mode = sys.argv[i]
@@ -66,7 +65,7 @@ def lexer_main():
             test_lexer_all(debug)
 
 if __name__ == '__main__':
-    lexer_main()
+    lexer_main(True)
 
 
 
