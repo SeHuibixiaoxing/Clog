@@ -11,7 +11,7 @@ module regfile(
 
     // read port 1
     input  wire[5] raddr1,
-    output wire[35] rdata1,
+    output wire[32] rdata1,
 
     // read port 2
     input  wire[5] raddr2,
