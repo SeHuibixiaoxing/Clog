@@ -231,6 +231,7 @@ class ModuleParaParaNode(ASTNode):
         super().__init__(*childs)
 
         self.name = ""
+        self.type = ""
 
 class ModuleParaPortNode(ASTNode):
     def __init__(self, *childs):

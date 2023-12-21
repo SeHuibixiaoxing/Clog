@@ -3,6 +3,7 @@
 1、bundle
 */
 
+
 bundle id_to_exe_io (
     wire id_is_lb,
     wire id_is_lbu,
@@ -12,7 +13,9 @@ bundle id_to_exe_io (
     wire[32] rt_value,
     wire[5] dest,
     wire[32] ds_pc
-);
+)
+
+
 
 module id (
     output id_to_exe_io id_to_exe_bus
@@ -28,8 +31,9 @@ module id (
     id_to_exe_bus.ds_pc := 32'h80000004;
 }
 
+
 module exe(
-    input id_to_exe_io from_id_bus
+    input id_to_exe_io from_id_bus,
     output wire id_is_lb,
     output wire id_is_lbu,
     output wire id_is_lh,
@@ -51,14 +55,17 @@ module exe(
 
 }
 
+
 module top_module(
     output id_to_exe_io bus_out
 
 ) {
     id_to_exe_io id_to_exe_bus;
 
-    id id_1(
+    id (
         out.id_to_exe_bus(id_to_exe_bus)
-    );
-    bus_out := id_to_exe_bus
+    )id_1;
+
+    bus_out := id_to_exe_bus;
 }
+

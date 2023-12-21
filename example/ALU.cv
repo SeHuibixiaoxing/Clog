@@ -7,8 +7,8 @@
 
 
 module alu(
-    para DATA_WIDTH,
-    para OP_NUM,
+    para int DATA_WIDTH,
+    para int OP_NUM,
     input  wire[OP_NUM] alu_op,
     input  wire[DATA_WIDTH] alu_src1,
     input  wire[DATA_WIDTH] alu_src2,

@@ -56,7 +56,8 @@ def p_constDecl(p):
 def p_cir_basic_type(p):
     """cir_basic_type : REG
                       | WIRE
-                      | CLOCK"""
+                      | CLOCK
+                      | ID"""
     p[0] = AST.CirBasicTypeNode()
     p[0].type = p[1]
 
@@ -143,10 +144,11 @@ def p_varDef(p):
 
 
 def p_modDecl(p):
-    """modDecl : ID ID '(' module_R_params ')'"""
-    p[0] = AST.ModDeclNode(p[4])
+    """modDecl : ID '(' module_R_params ')' ID array ';'"""
+    p[0] = AST.ModDeclNode(p[3], p[6])
     p[0].type = p[1]
-    p[0].name = p[2]
+    p[0].name = p[5]
+
 
 
 def p_R_port_def(p):
@@ -201,9 +203,24 @@ def p_bundleDef(p):
     p[0].name = p[1]
 
 
+def p_initVal_repeat(p):
+    """initVal_repeat : empty
+                      | ',' initVal initVal_repeat"""
+    p[0] = AST.ASTNode()
+    if len(p) == 4:
+        p[0].add_child(p[2])
+        p[0].merge(p[3])
+
+
 def p_initVal(p):
-    """initVal : exp ';'"""
-    p[0] = AST.InitValNode(p[1])
+    """initVal : exp
+               | '{' initVal initVal_repeat '}'"""
+    p[0] = AST.InitValNode()
+    if len(p) == 2:
+        p[0] = AST.InitValNode(p[1])
+    elif len(p) == 5:
+        p[0].add_child(p[2])
+        p[0].merge(p[3])
 
 
 def p_cirDecl_repeat(p):
@@ -285,13 +302,16 @@ def p_funcFParam(p):
 
 def p_module_para_para(p):
     """module_para_para : empty
-                   | PARA ID ',' module_para_para"""
+                   | PARA val_type ID ','
+                   | PARA val_type ID ',' module_para_para"""
     p[0] = AST.ASTNode()
-    if len(p) == 5:
+    if len(p) >= 5:
         tmp = AST.ModuleParaParaNode()
-        tmp.name = p[2]
+        tmp.name = p[3]
+        tmp.type = p[2]
         p[0].add_child(tmp)
-        p[0].merge(p[4])
+        if len(p) == 6:
+            p[0].merge(p[5])
 
 def p_module_para_port(p):
     """p_module_para_port : empty
@@ -306,7 +326,7 @@ def p_module_para_port(p):
 
 
 def p_module(p):
-    """module : MODULE ID '(' module_para_para port_def ID p_module_para_port"""
+    """module : MODULE ID '(' module_para_para port_def ID p_module_para_port ')' block"""
 
     p[0] = AST.ModuleNode()
     p[0].merge(p[4])
@@ -315,19 +335,20 @@ def p_module(p):
     tmp.add_child(p[5])
     p[0].add_child(tmp)
     p[0].merge(p[7])
-
     p[0].name = p[2]
+
+    p[0].add_child(p[9])
 
 def p_bundle_repeat(p):
     """bundle_repeat : empty
-                      | ',' cir_type ID bundle bundle_repeat"""
+                      | ',' cir_type ID bundle_repeat"""
     p[0] = AST.ASTNode()
-    if len(p) == 6:
+    if len(p) == 5:
         tmp = AST.BundleParaNode()
         tmp.name = p[3]
         tmp.type = p[2]
         p[0].add_child(tmp)
-        p[0].merge(p[5])
+        p[0].merge(p[4])
 
 def p_bundle(p):
     """bundle : BUNDLE ID '(' cir_type ID bundle_repeat ')'"""
@@ -410,8 +431,10 @@ def p_elifStmt(p):
 
 
 def p_elseStmt(p):
-    """elseStmt : ELSE stmt"""
-    p[0] = AST.ElseStmtNode(p[3])
+    """elseStmt : ELSE stmt
+                | empty"""
+    if len(p) == 3:
+        p[0] = AST.ElseStmtNode(p[3])
 
 def p_ifStmt(p):
     """ifStmt : IF '(' exp ')' stmt elifStmt elseStmt"""
@@ -420,8 +443,8 @@ def p_ifStmt(p):
 
 def p_forStmt(p):
     """
-     forStmt : FOR '(' varDecl ';' exp ';' exp ')' stmt
-            | GENERATE FOR '(' varDecl ';' exp ';' exp ')' COLON ID stmt
+     forStmt : FOR '(' varDecl exp ';' stmt ')' stmt
+            | GENERATE FOR '(' varDecl exp ';' exp ')' COLON ID stmt
     """
     if p[1] == "generate":
         p[0] = AST.ForStmtNode(p[4], p[6], p[8], p[11],p[12])
@@ -623,10 +646,6 @@ def p_relExp(p):
 def p_eqExp(p):
     """
     eqExp : relExp
-            | eqExp LT eqExp
-            | eqExp GT eqExp
-            | eqExp GE eqExp
-            | eqExp LE eqExp
             | eqExp EQUAL eqExp
             | eqExp NEQ eqExp
     """
@@ -672,12 +691,18 @@ def p_lOrExp(p):
 
 
 def p_port_def(p):
-    """port_def : INPUT
-                | OUTPUT
-                | INOUT"""
-    print(p[1])
-    p[0] = AST.PortDefNode(p[1])
+    """port_def : INPUT cir_type
+                | OUTPUT cir_type
+                | INOUT cir_type"""
+    p[0] = AST.PortDefNode(p[1], p[2])
+
 
 def p_constExp(p):
     """constExp : exp"""
     pass
+
+
+# Error rule for syntax errors
+def p_error(p):
+    print("Syntax error!")
+    print(p)
