@@ -2,7 +2,7 @@ import ply.yacc as yacc
 
 from token_rules import tokens
 
-
+in_seq = False
 class ASTNode():
     def __init__(self, *childs):
         self.parent = None
@@ -33,6 +33,7 @@ class ASTNode():
             for i in range(len(self.child)):
                 file.write('[')
                 self.child[i].to_Verilog(file)
+                file.write('-1:0')
                 file.write(']')
         elif self.flag == 'repeat_2':
             for i in range(len(self.child)//2):
@@ -68,6 +69,8 @@ class ArrayNode(ASTNode):
 class DeclNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        self.child[0].to_Verilog(file)
 
 
 class ConstDeclNode(ASTNode):
@@ -195,12 +198,38 @@ class CirDeclNode(ASTNode):
         super().__init__(*childs)
 
         self.name = ""
-        self.isInit = False
+
+    def to_Verilog(self,file):
+        self.child[0].to_Verilog(file)
+        file.write(' ')
+        for i in range(1,len(self.child)):
+            self.child[i].to_Verilog(file)
+            if i<len(self.child)-1:
+                file.write(',')
+        file.write(';\n')
+
 
 
 class CirDefNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+        self.isInit = False
+        self.name = ""
+
+    def to_Verilog(self,file):
+        if not self.isInit:
+            file.write(self.name)
+            self.child[0].to_Verilog(file)
+        else:
+            file.write(self.name)
+            self.child[0].to_Verilog(file)
+            if in_seq:
+                file.write('<=')
+            else:
+                file.write('=')
+            self.child[1].to_Verilog(file)
+
+
 
 
 class CirFunctionNode(ASTNode):
@@ -260,13 +289,14 @@ class ModuleNode(ASTNode):
             if hasattr(c,'type') and isinstance(c.type,ValTypeNode):
                 para_cnt += 1
         #print 参数
-        file.write("#(\n")
-        for i in range(para_cnt):
-            self.child[i].to_Verilog(file)
-            if i < para_cnt-1:
-                file.write(",")
-            file.write("\n")
-        file.write(")\n")
+        if para_cnt > 0:
+            file.write("#(\n")
+            for i in range(para_cnt):
+                self.child[i].to_Verilog(file)
+                if i < para_cnt-1:
+                    file.write(",")
+                file.write("\n")
+            file.write(")\n")
         #print port
         file.write("(\n")
         for i in range(para_cnt,len(self.child)-1):
@@ -341,13 +371,19 @@ class StmtNode(ASTNode):
             file.write(';\n')
         if self.type == 'assign':
             self.child[0].to_Verilog(file)
-            file.write('=')
+            if in_seq:
+                file.write('<=')
+            else:
+                file.write('=')
             self.child[1].to_Verilog(file)
             file.write(';\n')
         if self.type == 'connect':
             file.write('assign ')
             self.child[0].to_Verilog(file)
-            file.write('=')
+            if in_seq:
+                file.write('<=')
+            else:
+                file.write('=')
             self.child[1].to_Verilog(file)
             file.write(';\n')
 
@@ -358,10 +394,29 @@ class SeqLogStmtNode(ASTNode):
         self.clock = ""
         self.action = ""
 
+    def to_Verilog(self,file):
+        if self.action == 'rising':
+            file.write(f'always @(posedge {self.clock}) ')
+        if self.action == 'falling':
+            file.write(f'always @(negedge {self.clock}) ')
+        if self.action == 'both':
+            file.write(f'always @({self.clock}) ')
+        global in_seq
+        in_seq = True
+        self.child[0].to_Verilog(file)
+        in_seq = False
+
+
 
 class IfStmtNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        file.write('if(')
+        self.child[0].to_Verilog(file)
+        file.write(')\n')
+        self.child[1].to_Verilog(file)
+
 
 
 class ElifStmtNode(ASTNode):
@@ -417,8 +472,12 @@ class LValNode(ASTNode):
             file.write(self.child[0])
             self.child[1].to_Verilog(file)
         if self.flag == 'type2':
-            #TODO:fix
-            pass
+            file.write(' (')
+            self.child[0].to_Verilog(file)
+            file.write(') ? ')
+            self.child[1].to_Verilog(file)
+            file.write(' : ')
+            self.child[2].to_Verilog(file)
 
         if self.flag == 'type3':
             self.child[0].to_Verilog(file)
@@ -623,7 +682,10 @@ class CirBasicTypeNode(ASTNode):
         self.type = ""
 
     def to_Verilog(self,file):
-        file.write(self.type)
+        if self.type == 'clock':
+            file.write('wire')
+        else:
+            file.write(self.type)
 
 class CirTypeNode(ASTNode):
     def __init__(self, *childs):

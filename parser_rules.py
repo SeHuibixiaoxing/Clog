@@ -37,7 +37,7 @@ def p_comp_decl(p):
             | modDecl
             | bundleDecl"""
 
-    p[0] = AST.CompUnitNode(p[1])
+    p[0] = AST.DeclNode(p[1])
 
 def p_constDecl_repeat(p):
     """constDecl_repeat : empty
@@ -86,17 +86,17 @@ def p_type_def(p):
     p[0] = AST.TypeDefNode(p[1])
 
 
-def p_array(p):
-    """array : empty
-             | '[' constExp ']' array"""
-    p[0] = AST.ArrayNode()
-    if len(p) == 5:
-        p[0].add_child(p[2])
-        p[0].merge(p[4])
+# def p_array(p):
+#     """array : empty
+#              | '[' constExp ']' array"""
+#     p[0] = AST.ArrayNode()
+#     if len(p) == 5:
+#         p[0].add_child(p[2])
+#         p[0].merge(p[4])
 
 
 def p_constDef(p):
-    """constDef : ID array ASSIGN constInitVal"""
+    """constDef : ID array_exp_repeat1 ASSIGN constInitVal"""
     p[0] = AST.ConstDefNode(p[2], p[4])
 
 
@@ -135,8 +135,8 @@ def p_varDecl(p):
 
 
 def p_varDef(p):
-    """varDef : ID array
-              | ID array ASSIGN initVal"""
+    """varDef : ID array_exp_repeat1
+              | ID array_exp_repeat1 ASSIGN initVal"""
     p[0] = AST.VarDefNode(p[2])
     p[0].identifier = p[1]
     p[0].isInit = False
@@ -146,7 +146,7 @@ def p_varDef(p):
 
 
 def p_modDecl(p):
-    """modDecl : ID '(' module_R_params ')' ID array ';'"""
+    """modDecl : ID '(' module_R_params ')' ID array_exp_repeat1 ';'"""
     p[0] = AST.ModDeclNode(p[3], p[6])
     p[0].type = p[1]
     p[0].name = p[5]
@@ -200,7 +200,7 @@ def p_bundleDecl(p):
 
 
 def p_bundleDef(p):
-    """bundleDef : ID array"""
+    """bundleDef : ID array_exp_repeat1"""
     p[0] = AST.BundleDefNode(p[2])
     p[0].name = p[1]
 
@@ -235,13 +235,14 @@ def p_cirDecl_repeat(p):
 
 def p_cirDecl(p):
     """cirDecl : cir_type cirDef cirDecl_repeat ';'"""
-    p[0] = AST.CirDeclNode(p[1], p[2], p[3])
+    p[0] = AST.CirDeclNode(p[1], p[2])
+    p[0].merge(p[3])
 
 
 def p_cirDef(p):
-    """cirDef : ID array
-              | ID array ASSIGN initVal"""
-    p[0] = AST.CirDeclNode(p[2])
+    """cirDef : ID array_exp_repeat1
+              | ID array_exp_repeat1 ASSIGN initVal"""
+    p[0] = AST.CirDefNode(p[2])
     p[0].name = p[1]
     p[0].isInit = False
     if len(p) == 5:
@@ -292,12 +293,12 @@ def p_funcFParams(p):
 
 
 def p_cir_funcFParam(p):
-    """cir_funcFParam : type_def ID array"""
+    """cir_funcFParam : type_def ID array_exp_repeat1"""
     p[0]  =AST.CirFuncFParamNode(p[1])
     p[0].name = p[2]
 
 def p_funcFParam(p):
-    """funcFParam : val_type ID array"""
+    """funcFParam : val_type ID array_exp_repeat1"""
     p[0] = AST.FuncFParamNode(p[1])
     p[0].name = p[2]
 
@@ -473,7 +474,7 @@ def p_lVal(p):
     if len(p) == 3:
         p[0].add_child(p[1], p[2])
         p[0].flag = 'type1'
-    if len(p) == 8:
+    if len(p) == 9:
         p[0].add_child(p[3], p[5], p[7])
         p[0].flag = 'type2'
     if len(p) == 4:
