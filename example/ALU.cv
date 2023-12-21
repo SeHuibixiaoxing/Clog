@@ -28,17 +28,17 @@ wire op_sll;
 wire op_sra;
 wire op_srl;
 
-op_lui = alu_op[0];
-op_or = alu_op[1];
-op_add = alu_op[2];
-op_and = alu_op[3];
-op_xor = alu_op[4];
-op_sub = alu_op[5];
-op_slt = alu_op[6];
-op_mul = alu_op[7];
-op_sll = alu_op[8];
-op_sra = alu_op[9];
-op_srl = alu_op[10];
+op_lui := alu_op[0];
+op_or := alu_op[1];
+op_add := alu_op[2];
+op_and := alu_op[3];
+op_xor := alu_op[4];
+op_sub := alu_op[5];
+op_slt := alu_op[6];
+op_mul := alu_op[7];
+op_sll := alu_op[8];
+op_sra := alu_op[9];
+op_srl := alu_op[10];
 
 
 // LUI
