@@ -9,7 +9,7 @@ module decoder(
     input  wire [IN_WIDTH] in_port,
     output wire [OUT_WIDTN] out_port
 ){
-    generate for (int i=0; j<OUT_WIDTN; i=i+1) : gen_for_dec {
+    generate for (int i=0; i<OUT_WIDTN; i=i+1) : gen_for_dec {
         out_port[i] := (in_port == i);
     }
 }
