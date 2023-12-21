@@ -659,10 +659,10 @@ def p_eqExp(p):
 def p_redExp(p):
     """
     redExp : eqExp
-            | redExp AND eqExp
-            | redExp OR eqExp
-            | redExp XOR eqExp
-            | redExp XNOR eqExp
+            | eqExp AND redExp
+            | eqExp OR redExp
+            | eqExp XOR redExp
+            | eqExp XNOR redExp
 
     """
     if len(p) == 2:
