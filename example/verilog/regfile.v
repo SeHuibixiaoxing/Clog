@@ -2,24 +2,25 @@ module regfile(
     input         clk,
 
     // read port 1
-    input  [ 4:0] raddr1,
-    output [31:0] rdata1,
+    input  [5-1:0] raddr1,
+    output [32-1:0] rdata1,
 
     // read port 2
-    input  [ 4:0] raddr2,
-    output [31:0] rdata2,
+    input  [5-1:0] raddr2,
+    output [32-1:0] rdata2,
 
     // write port
     input         we    ,     
-    input  [ 4:0] waddr ,
-    input  [31:0] wdata
+    input  [5-1:0] waddr ,
+    input  [32-1:0] wdata
 );
 
-reg [31:0] rf[31:1];
+reg [32-1:0] rf[32-1:0];
 
 //write
 always @(posedge clk) begin
-    if (we) rf[waddr] <= wdata;
+    if (we)
+        rf[waddr] <= wdata;
 end
 
 //read port 1
