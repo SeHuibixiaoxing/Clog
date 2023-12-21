@@ -80,17 +80,15 @@ xor_result := alu_src1 ^ alu_src2;
 
 // LUI
 wire[DATA_WIDTH] lui_result;
-//lui_result := {alu_src2[DATA_WIDTH / 2 - 1:0], {(DATA_WIDTH/2)'b0}};
-a = a**2+1;
-lui_result := alu_src2[a*2+1:0];
+int HALF_DATA_WIDTH = DATA_WIDTH /2;
+lui_result := {alu_src2[-1+DATA_WIDTH / 2:0], {(DATA_WIDTH/2)'b0}};
 // SLL
 wire[DATA_WIDTH] sll_result;
-sll_result := alu_src2 << alu_src1[4:0];
+alu_src2 << alu_src1[4:0];
 
 // SRL, SRA
 wire[DATA_WIDTH*2] sr64_result;
 sr64_result := {{DATA_WIDTH{op_sra & alu_src2[DATA_WIDTH - 1]}}, alu_src2[DATA_WIDTH - 1:0]} >> alu_src1[4:0];
-
 // alu result generate
 alu_result := ({DATA_WIDTH{op_add|op_sub}} & add_sub_result)
                   | ({DATA_WIDTH{op_slt       }} & slt_result)
@@ -102,4 +100,5 @@ alu_result := ({DATA_WIDTH{op_add|op_sub}} & add_sub_result)
                   | ({DATA_WIDTH{op_lui       }} & lui_result)
                   | ({DATA_WIDTH{op_sll       }} & sll_result)
                   | ({DATA_WIDTH{op_srl|op_sra}} & sr64_result[DATA_WIDTH - 1:0]);
+
 }
