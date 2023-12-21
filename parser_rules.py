@@ -657,17 +657,16 @@ def p_eqExp(p):
 def p_redExp(p):
     """
     redExp : eqExp
-            | AND eqExp
-            | OR eqExp
-            | NOT eqExp
-            | XOR eqExp
-            | XNOR eqExp
+            | redExp AND eqExp
+            | redExp OR eqExp
+            | redExp XOR eqExp
+            | redExp XNOR eqExp
 
     """
     if len(p) == 2:
         p[0] = AST.RedExpNode(p[1])
     else:
-        p[0] = AST.RedExpNode(p[1],p[2])
+        p[0] = AST.RedExpNode(p[1], p[2], p[3])
 
 def p_lAndExp(p):
     """
