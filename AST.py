@@ -45,6 +45,7 @@ class ASTNode():
             for i in range(len(self.child)//2):
                 file.write('[')
                 self.child[2*i].to_Verilog(file)
+                file.write(':')
                 self.child[2*i+1].to_Verilog(file)
                 file.write(']')
         elif self.flag == 'exp repeat':
