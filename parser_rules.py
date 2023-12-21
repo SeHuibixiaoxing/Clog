@@ -466,6 +466,7 @@ def p_lVal(p):
         | MUX '(' exp ',' exp ',' exp ')'
         | lVal '.' ID
         | '{' exp exp_repeat '}'
+        | exp '{' exp exp_repeat '}'
     """
     p[0] = AST.LValNode()
     if len(p) == 3:
@@ -477,6 +478,9 @@ def p_lVal(p):
     if len(p) == 5:
         p[0].add_child(p[2])
         p[0].merge(p[3])
+    if len(p) == 6:
+        p[0].add_child(p[1],p[3])
+        p[0].merge(p[4])
 
 def p_primaryExp(p):
     """
@@ -561,9 +565,9 @@ def p_unaryExp(p):
 def p_unaryOp(p):
     """
     unaryOp : ADD
-    | SUB
-    | NOT
-    | NOTL
+            | SUB
+            | NOT
+            | NOTL
     """
     p[0] = AST.UnaryOpNode(p[1])
 
