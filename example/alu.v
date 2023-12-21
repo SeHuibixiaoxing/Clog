@@ -76,7 +76,7 @@ assign xor_result = alu_src1 ^ alu_src2;
 
 // LUI
 wire [DATA_WIDTH - 1: 0] lui_result;
-assign lui_result = {alu_src2[DATA_WIDTH / 2 - 1:0], {(DATA_WIDTH/2){1'b0}}};
+assign lui_result = {alu_src2[-1+DATA_WIDTH / 2:0], {(DATA_WIDTH/2){1'b0}}};
 
 // SLL  
 wire [DATA_WIDTH - 1: 0] sll_result; 
