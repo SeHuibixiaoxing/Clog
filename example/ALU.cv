@@ -16,31 +16,48 @@ module alu(
 ) {
 
 // operation decode
+wire op_lui;
+wire op_ori;
 wire op_add;
+wire op_and;
+wire op_xor;
 wire op_sub;
 wire op_slt;
-wire op_sltu;
-wire op_and;
-wire op_nor;
-wire op_or;
-wire op_xor;
+wire op_mul;
 wire op_sll;
-wire op_srl;
 wire op_sra;
-wire op_lui;
+wire op_srl;
 
-op_add  := alu_op[ 0];
-op_sub  := alu_op[ 1];
-op_slt  := alu_op[ 2];
-op_sltu := alu_op[ 3];
-op_and  := alu_op[ 4];
-op_nor  := alu_op[ 5];
-op_or   := alu_op[ 6];
-op_xor  := alu_op[ 7];
-op_sll  := alu_op[ 8];
-op_srl  := alu_op[ 9];
-op_sra  := alu_op[10];
-op_lui  := alu_op[11];
+op_lui = alu_op[0];
+op_or = alu_op[1];
+op_add = alu_op[2];
+op_and = alu_op[3];
+op_xor = alu_op[4];
+op_sub = alu_op[5];
+op_slt = alu_op[6];
+op_mul = alu_op[7];
+op_sll = alu_op[8];
+op_sra = alu_op[9];
+op_srl = alu_op[10];
+
+
+// LUI
+wire[DATA_WIDTH] lui_result;
+lui_result := {alu_src2[-1+DATA_WIDTH / 2:0], {(DATA_WIDTH/2)'b0}};
+
+
+// bit operation
+wire[DATA_WIDTH] and_result;
+wire[DATA_WIDTH] nor_result;
+wire[DATA_WIDTH] or_result;
+wire[DATA_WIDTH] xor_result;
+and_result := alu_src1 & alu_src2;
+or_result  := alu_src1 | alu_src2;
+nor_result := ~or_result;
+xor_result := alu_src1 ^ alu_src2;
+
+
+
 
 // 32-bit adder
 wire[DATA_WIDTH] adder_a;
@@ -49,8 +66,8 @@ wire        adder_cin;
 wire[DATA_WIDTH] adder_result;
 wire        adder_cout;
 adder_a := alu_src1;
-adder_b := Mux((op_sub | op_slt | op_sltu), ~alu_src2, alu_src2);
-adder_cin := Mux((op_sub | op_slt | op_sltu), 1'b1, 1'b0);
+adder_b := Mux((op_sub | op_slt), ~alu_src2, alu_src2);
+adder_cin := Mux((op_sub | op_slt), 1'b1, 1'b0);
 {adder_cout, adder_result} := adder_a + adder_b + adder_cin;
 
 // ADD, SUB
@@ -63,25 +80,6 @@ slt_result[31:1] := 0;
 slt_result[0]    := (alu_src1[DATA_WIDTH - 1] & ~alu_src2[DATA_WIDTH - 1])
                         | ((alu_src1[DATA_WIDTH - 1] ~^ alu_src2[DATA_WIDTH - 1]) & adder_result[DATA_WIDTH - 1]);
 
-// SLTU
-wire[DATA_WIDTH] sltu_result;
-sltu_result[DATA_WIDTH - 1:1] := 0;
-sltu_result[0] := ~adder_cout;
-
-// bit operation
-wire[DATA_WIDTH] and_result;
-wire[DATA_WIDTH] nor_result;
-wire[DATA_WIDTH] or_result;
-wire[DATA_WIDTH] xor_result;
-and_result := alu_src1 & alu_src2;
-or_result  := alu_src1 | alu_src2;
-nor_result := ~or_result;
-xor_result := alu_src1 ^ alu_src2;
-
-// LUI
-wire[DATA_WIDTH] lui_result;
-int HALF_DATA_WIDTH = DATA_WIDTH /2;
-lui_result := {alu_src2[-1+DATA_WIDTH / 2:0], {(DATA_WIDTH/2)'b0}};
 // SLL
 wire[DATA_WIDTH] sll_result;
 alu_src2 << alu_src1[4:0];
@@ -92,9 +90,7 @@ sr64_result := {{DATA_WIDTH{op_sra & alu_src2[DATA_WIDTH - 1]}}, alu_src2[DATA_W
 // alu result generate
 alu_result := ({DATA_WIDTH{op_add|op_sub}} & add_sub_result)
                   | ({DATA_WIDTH{op_slt       }} & slt_result)
-                  | ({DATA_WIDTH{op_sltu      }} & sltu_result)
                   | ({DATA_WIDTH{op_and       }} & and_result)
-                  | ({DATA_WIDTH{op_nor       }} & nor_result)
                   | ({DATA_WIDTH{op_or        }} & or_result)
                   | ({DATA_WIDTH{op_xor       }} & xor_result)
                   | ({DATA_WIDTH{op_lui       }} & lui_result)
