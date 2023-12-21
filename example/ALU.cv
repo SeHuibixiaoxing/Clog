@@ -80,8 +80,9 @@ xor_result := alu_src1 ^ alu_src2;
 
 // LUI
 wire[DATA_WIDTH] lui_result;
-lui_result := {alu_src2[DATA_WIDTH / 2 - 1:0], {(DATA_WIDTH/2)'b0}};
-
+//lui_result := {alu_src2[DATA_WIDTH / 2 - 1:0], {(DATA_WIDTH/2)'b0}};
+a = a**2+1;
+lui_result := alu_src2[a*2+1:0];
 // SLL
 wire[DATA_WIDTH] sll_result;
 sll_result := alu_src2 << alu_src1[4:0];

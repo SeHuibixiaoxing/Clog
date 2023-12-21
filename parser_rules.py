@@ -39,7 +39,6 @@ def p_comp_decl(p):
 
     p[0] = AST.CompUnitNode(p[1])
 
-
 def p_constDecl_repeat(p):
     """constDecl_repeat : empty
                         | ',' constDef constDecl_repeat"""
@@ -386,7 +385,7 @@ def p_stmt(p):
     """stmt : lVal ASSIGN exp ';'
             | lVal CONNECT exp ';'
             | ';'
-            | exp
+            | exp ';'
             | block
             | seqLogStmt
             | ifStmt
@@ -464,20 +463,20 @@ def p_lVal(p):
     """
     lVal : ID array_exp_repeat1
         | ID array_exp_repeat2
-        | '{' ID array_exp_repeat1 lVal_repeat '}'
-        | '{' ID array_exp_repeat2 lVal_repeat '}'
         | MUX '(' exp ',' exp ',' exp ')'
         | lVal '.' ID
+        | '{' exp exp_repeat '}'
     """
     p[0] = AST.LValNode()
     if len(p) == 3:
         p[0].add_child(p[1], p[2])
-    if len(p) == 6:
-        p[0].add_child(p[2], p[3], p[4])
     if len(p) == 8:
         p[0].add_child(p[3], p[5], p[7])
     if len(p) == 4:
         p[0].add_child(p[1], p[3])
+    if len(p) == 5:
+        p[0].add_child(p[2])
+        p[0].merge(p[3])
 
 def p_primaryExp(p):
     """
@@ -577,7 +576,7 @@ def p_exp_repeat(p):
 
     p[0] = AST.ASTNode()
     if len(p) == 4:
-        p[0].add_children(p[2])
+        p[0].add_child(p[2])
         p[0].merge(p[3])
         p[0].flag = 'exp repeat'
 
@@ -597,10 +596,10 @@ def p_funcRParams(p):
 def p_mulExp(p):
     """
     mulExp : unaryExp
-            | mulExp MUL unaryExp
-            | mulExp DIV unaryExp
-            | mulExp MOD unaryExp
-            | mulExp POWER unaryExp
+            | unaryExp MUL mulExp
+            | unaryExp DIV mulExp
+            | unaryExp MOD mulExp
+            | unaryExp POWER mulExp
     """
     if len(p) == 2:
         p[0] = AST.MulExpExpNode(p[1])
@@ -610,8 +609,8 @@ def p_mulExp(p):
 def p_addExp(p):
     """
     addExp : mulExp
-            | addExp ADD mulExp
-            | addExp SUB mulExp
+            | mulExp ADD addExp
+            | mulExp SUB addExp
     """
     if len(p) == 2:
         p[0] = AST.AddExpNode(p[1])
@@ -621,9 +620,9 @@ def p_addExp(p):
 def p_shiftExp(p):
     """
     shiftExp : addExp
-            | shiftExp SLL addExp
-            | shiftExp SRL addExp
-            | shiftExp SRA addExp
+            | addExp SLL shiftExp
+            | addExp SRL shiftExp
+            | addExp SRA shiftExp
     """
     if len(p) == 2:
         p[0] = AST.ShiftExpNode(p[1])
@@ -634,10 +633,10 @@ def p_shiftExp(p):
 def p_relExp(p):
     """
     relExp : shiftExp
-            | relExp LT addExp
-            | relExp GT addExp
-            | relExp GE addExp
-            | relExp LE addExp
+            | shiftExp LT relExp
+            | shiftExp GT relExp
+            | shiftExp GE relExp
+            | shiftExp LE relExp
     """
     if len(p) == 2:
         p[0] = AST.RelExpNode(p[1])
@@ -648,8 +647,8 @@ def p_relExp(p):
 def p_eqExp(p):
     """
     eqExp : relExp
-            | eqExp EQUAL eqExp
-            | eqExp NEQ eqExp
+            | relExp EQUAL eqExp
+            | relExp NEQ eqExp
     """
     if len(p) == 2:
         p[0] = AST.EqExpNode(p[1])
@@ -673,7 +672,7 @@ def p_redExp(p):
 def p_lAndExp(p):
     """
     lAndExp : redExp
-            | lAndExp LAND redExp
+            | redExp LAND lAndExp
     """
     if len(p) == 2:
         p[0] = AST.LAndExpNode(p[1])
@@ -683,14 +682,33 @@ def p_lAndExp(p):
 def p_lOrExp(p):
     """
     lOrExp : lAndExp
-            | lOrExp LOR lAndExp
+            | lAndExp LOR lOrExp
     """
     if len(p) == 2:
         p[0] = AST.LOrExpNode(p[1])
     else:
         p[0] = AST.LOrExpNode(p[1],p[2],p[3])
 
-
+# def p_connectExp(p):
+#     """
+#     connectExp : lOrExp
+#                 | '{' lOrExp connectExp_repeat '}'
+#     """
+#     if len(p) == 2:
+#         p[0] = AST.ConnectExpNode(p[1])
+#     else:
+#         p[0] = AST.ConnectExpNode(p[2])
+#         p[0].merge(p[3])
+# def p_connectExp_repeat(p):
+#     """
+#    connectExp_repeat : empty
+#                         | ',' lOrExp connectExp_repeat
+#     """
+#     if len(p) == 4:
+#         p[0] = AST.ASTNode(p[2])
+#         p[0].merge(p[3])
+#     else:
+#         p[0] = AST.ASTNode()
 def p_port_def(p):
     """port_def : INPUT cir_type
                 | OUTPUT cir_type

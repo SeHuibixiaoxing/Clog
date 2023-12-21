@@ -360,7 +360,9 @@ class LOrExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
-
+class ConnectExpNode(ASTNode):
+    def __init__(self, *childs):
+        super().__init__(*childs)
 class ConstExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
