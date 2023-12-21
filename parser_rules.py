@@ -10,22 +10,24 @@ def p_empty(p):
 
 
 def p_compUnit_repeat(p):
-    """compUnit : empty
-                | compUnit compUnit"""
+    """compUnit_repeat : empty
+                | compUnit compUnit_repeat"""
 
-    p[0] = AST.CompUnitNode()
+    p[0] = AST.ASTNode()
     if len(p) == 3:
-        p[0].merge(p[1], p[2])
+        p[0].add_child(p[1])
+        p[0].merge(p[2])
 
 
 def p_compUnit(p):
-    """compUnit : decl
-                | cir_function
-                | function
-                | module
-                | bundle"""
+    """compUnit : decl compUnit_repeat
+                | cir_function compUnit_repeat
+                | function compUnit_repeat
+                | module compUnit_repeat
+                | bundle compUnit_repeat"""
 
     p[0] = AST.CompUnitNode(p[1])
+    p[0].merge(p[2])
 
 
 def p_comp_decl(p):
