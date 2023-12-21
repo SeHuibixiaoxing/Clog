@@ -9,6 +9,7 @@ class ASTNode():
         self.child = []
         self.flag = None
         self.add_child(*childs)
+        self.isDef = False
 
     def add_child(self, *childs):
         for child in childs:
@@ -31,10 +32,15 @@ class ASTNode():
     def to_Verilog(self,file):
         if self.flag == 'repeat_1':
             for i in range(len(self.child)):
-                file.write('[')
-                self.child[i].to_Verilog(file)
-                file.write('-1:0')
-                file.write(']')
+                if self.isDef:
+                    file.write('[')
+                    self.child[i].to_Verilog(file)
+                    file.write('-1:0')
+                    file.write(']')
+                else:
+                    file.write('[')
+                    self.child[i].to_Verilog(file)
+                    file.write(']')
         elif self.flag == 'repeat_2':
             for i in range(len(self.child)//2):
                 file.write('[')
@@ -378,7 +384,8 @@ class StmtNode(ASTNode):
             self.child[1].to_Verilog(file)
             file.write(';\n')
         if self.type == 'connect':
-            file.write('assign ')
+            if not in_seq:
+                file.write('assign ')
             self.child[0].to_Verilog(file)
             if in_seq:
                 file.write('<=')

@@ -97,6 +97,7 @@ def p_type_def(p):
 
 def p_constDef(p):
     """constDef : ID array_exp_repeat1 ASSIGN constInitVal"""
+    p[2].isDef = True
     p[0] = AST.ConstDefNode(p[2], p[4])
 
 
@@ -137,6 +138,7 @@ def p_varDecl(p):
 def p_varDef(p):
     """varDef : ID array_exp_repeat1
               | ID array_exp_repeat1 ASSIGN initVal"""
+    p[2].isDef = True
     p[0] = AST.VarDefNode(p[2])
     p[0].identifier = p[1]
     p[0].isInit = False
@@ -201,6 +203,7 @@ def p_bundleDecl(p):
 
 def p_bundleDef(p):
     """bundleDef : ID array_exp_repeat1"""
+    p[2].isDef = True
     p[0] = AST.BundleDefNode(p[2])
     p[0].name = p[1]
 
@@ -243,6 +246,7 @@ def p_cirDef(p):
     """cirDef : ID array_exp_repeat1
               | ID array_exp_repeat1 ASSIGN initVal"""
     p[0] = AST.CirDefNode(p[2])
+    p[2].isDef = True
     p[0].name = p[1]
     p[0].isInit = False
     if len(p) == 5:
