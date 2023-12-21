@@ -130,7 +130,8 @@ def p_varDef_repeat(p):
 
 def p_varDecl(p):
     """varDecl : val_type varDef varDef_repeat ';'"""
-    p[0] = AST.VarDeclNode(p[1], p[2], p[3])
+    p[0] = AST.VarDeclNode(p[1], p[2])
+    p[0].merge(p[3])
 
 
 def p_varDef(p):
@@ -393,7 +394,7 @@ def p_stmt(p):
             | RETURN exp ';'"""
     p[0] = AST.StmtNode()
     p[0].type = "empty"
-    if len(p) == 1 and p[1] != ';':
+    if len(p) == 2 and p[1] != ';':
         p[0].add_child(p[1])
         p[0].type = "other"
     elif len(p) == 4:
@@ -471,16 +472,21 @@ def p_lVal(p):
     p[0] = AST.LValNode()
     if len(p) == 3:
         p[0].add_child(p[1], p[2])
+        p[0].flag = 'type1'
     if len(p) == 8:
         p[0].add_child(p[3], p[5], p[7])
+        p[0].flag = 'type2'
     if len(p) == 4:
         p[0].add_child(p[1], p[3])
+        p[0].flag = 'type3'
     if len(p) == 5:
         p[0].add_child(p[2])
         p[0].merge(p[3])
+        p[0].flag = 'type4'
     if len(p) == 6:
         p[0].add_child(p[1],p[3])
         p[0].merge(p[4])
+        p[0].flag = 'type5'
 
 def p_primaryExp(p):
     """
@@ -532,7 +538,8 @@ def p_number(p):
     | FLOAT_CONST
     | circuit_const
     """
-    p[0] = p[1]
+
+    p[0] = AST.NumberNode(p[1])
 def p_circuit_const(p):
     """
     circuit_const : exp BIT_WIDTH_NUMBER
@@ -561,6 +568,7 @@ def p_unaryExp(p):
             p[0].flag = 'func with param'
     if len(p) == 3:
         p[0] = AST.UnaryExpNode(p[1], p[2])
+        p[0].flag = 'unaryOp'
 
 def p_unaryOp(p):
     """

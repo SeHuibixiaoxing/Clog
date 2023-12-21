@@ -16,7 +16,7 @@ def print_token(lexer):
 
         print(tok)
 
-def test_file(filename, debug=False, encoding='utf-8'):
+def test_file(filename, output_filename,debug=False, encoding='utf-8'):
     f = open(filename, encoding=encoding)
     data = f.read()
     lexer = lex.lex(module=token_rules, debug=debug)
@@ -25,24 +25,26 @@ def test_file(filename, debug=False, encoding='utf-8'):
 
     parser1 = yacc.yacc()
     result = parser1.parse(input=data, lexer=lexer)
-    print(result)
+    with open(output_filename, "w") as file:
+        result.to_Verilog(file)
+
 
 
 def test_lexer_ALU(debug=False):
     print("######example/ALU.cv")
-    test_file("example/ALU.cv", debug, 'utf-8')
+    test_file("example/ALU.cv","example/result/ALU.v", debug, 'utf-8')
 
 def test_lexer_bundle(debug=False):
     print("######example/bundle_test.cv")
-    test_file("example/bundle_test.cv", debug, 'utf-8')
+    test_file("example/bundle_test.cv","example/result/bundle_test.v", debug, 'utf-8')
 
 def test_lexer_regfile(debug=False):
     print("######example/regfile.cv")
-    test_file("example/regfile.cv", debug, 'utf-8')
+    test_file("example/regfile.cv", "example/result/regfile.v",debug, 'utf-8')
 
 def test_lexer_tools(debug=False):
     print("######example/tools.cv")
-    test_file("example/tools.cv", debug, 'utf-8')
+    test_file("example/tools.cv", "example/result/tools.v",debug, 'utf-8')
 
 def test_lexer_all(debug=False):
     test_lexer_ALU(debug)

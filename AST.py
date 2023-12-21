@@ -28,10 +28,36 @@ class ASTNode():
                 attr_value = getattr(self, attr_name)
                 print(f",{attr_name}: {attr_value}", end="")
 
+    def to_Verilog(self,file):
+        if self.flag == 'repeat_1':
+            for i in range(len(self.child)):
+                file.write('[')
+                self.child[i].to_Verilog(file)
+                file.write(']')
+        elif self.flag == 'repeat_2':
+            for i in range(len(self.child)//2):
+                file.write('[')
+                self.child[2*i].to_Verilog(file)
+                self.child[2*i+1].to_Verilog(file)
+                file.write(']')
+        elif self.flag == 'exp repeat':
+            for i in range(len(self.child)):
+                self.child[i].to_Verilog(file)
+                if i < len(self.child)-1:
+                    file.write(',')
+        else:
+            for c in self.child:
+                if isinstance(c,str):
+                    file.write(c)
+                else:
+                    c.to_Verilog(file)
 
 class CompUnitNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        for c in self.child:
+            c.to_Verilog(file)
 
 
 class ArrayNode(ASTNode):
@@ -85,6 +111,8 @@ class ConstInitValNode(ASTNode):
 class VarDeclNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+
+
 
 
 class VarDefNode(ASTNode):
@@ -225,6 +253,34 @@ class ModuleNode(ASTNode):
         super().__init__(*childs)
 
         self.name = ""
+    def to_Verilog(self,file):
+        file.write(f"module {self.name}\n")
+        para_cnt = 0
+        for c in self.child:
+            if hasattr(c,'type') and isinstance(c.type,ValTypeNode):
+                para_cnt += 1
+        #print 参数
+        file.write("#(\n")
+        for i in range(para_cnt):
+            self.child[i].to_Verilog(file)
+            if i < para_cnt-1:
+                file.write(",")
+            file.write("\n")
+        file.write(")\n")
+        #print port
+        file.write("(\n")
+        for i in range(para_cnt,len(self.child)-1):
+            self.child[i].to_Verilog(file)
+            if i < len(self.child)-2:
+                file.write(",")
+            file.write("\n")
+        file.write(");\n")
+        self.child[-1].to_Verilog(file)
+        file.write("endmodule\n")
+
+
+
+
 
 class ModuleParaParaNode(ASTNode):
     def __init__(self, *childs):
@@ -232,6 +288,8 @@ class ModuleParaParaNode(ASTNode):
 
         self.name = ""
         self.type = ""
+    def to_Verilog(self,file):
+        file.write(f"parameter {self.name} = 32")
 
 class ModuleParaPortNode(ASTNode):
     def __init__(self, *childs):
@@ -239,15 +297,34 @@ class ModuleParaPortNode(ASTNode):
 
         self.name = ""
 
+    def to_Verilog(self,file):
+        for c in self.child:
+            c.to_Verilog(file)
+        file.write(self.name)
+
 class BlockNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
+    def to_Verilog(self,file):
+        print_b_e = True
+        if isinstance(self.parent,ModuleNode):
+            print_b_e = False
+        if isinstance(self.parent.parent,ForStmtNode) and self.parent.parent.is_generate:
+            print_b_e = False
+        if print_b_e:
+            file.write('begin\n')
+        for c in self.child:
+            c.to_Verilog(file)
+        if print_b_e:
+            file.write('end\n')
 
 class BlockItemNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
+    def to_Verilog(self,file):
+        for c in self.child:
+            c.to_Verilog(file)
 
 class StmtNode(ASTNode):
     def __init__(self, *childs):
@@ -255,6 +332,24 @@ class StmtNode(ASTNode):
 
         self.type = ""
 
+    def to_Verilog(self,file):
+        if self.type == 'other':
+            self.child[0].to_Verilog(file)
+        if self.type == 'return':
+            file.write('return ')
+            self.child[0].to_Verilog(file)
+            file.write(';\n')
+        if self.type == 'assign':
+            self.child[0].to_Verilog(file)
+            file.write('=')
+            self.child[1].to_Verilog(file)
+            file.write(';\n')
+        if self.type == 'connect':
+            file.write('assign ')
+            self.child[0].to_Verilog(file)
+            file.write('=')
+            self.child[1].to_Verilog(file)
+            file.write(';\n')
 
 class SeqLogStmtNode(ASTNode):
     def __init__(self, *childs):
@@ -286,34 +381,115 @@ class ForStmtNode(ASTNode):
         super().__init__(*childs)
         self.is_generate = False
 
+    def to_Verilog(self,file):
+        if self.is_generate:
+            #读出genvar
+            gen_variable = self.child[0].child[1].identifier
+            file.write(f'genvar {gen_variable};\n')
+            file.write('generate\n')
+            file.write(f'for ({gen_variable}=')
+            self.child[0].child[1].child[1].child[0].to_Verilog(file)
+            file.write(';')
+            self.child[1].to_Verilog(file)
+            file.write(';')
+            file.write(f'{gen_variable}=')
+            self.child[3].to_Verilog(file)
+            file.write(f') begin: {self.child[4]}')
+            file.write('\n')
+            self.child[5].to_Verilog(file)
+            file.write('end\n')
+            file.write('endgenerate\n')
+
 class ExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+
+    def to_Verilog(self,file):
+        self.child[0].to_Verilog(file)
 
 
 class LValNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
+    def to_Verilog(self,file):
+        if self.flag == 'type1':
+            file.write(self.child[0])
+            self.child[1].to_Verilog(file)
+        if self.flag == 'type2':
+            #TODO:fix
+            pass
+
+        if self.flag == 'type3':
+            self.child[0].to_Verilog(file)
+            file.write('.')
+            file.write(self.child[0])
+        if self.flag == 'type4':
+            file.write('{')
+            for i in range(len(self.child)):
+                self.child[i].to_Verilog(file)
+                if i < len(self.child)-1:
+                    file.write(',')
+            file.write('}')
+        if self.flag == 'type5':
+            self.child[0].to_Verilog(file)
+            file.write('{')
+            for i in range(1,len(self.child)):
+                self.child[i].to_Verilog(file)
+                if i < len(self.child)-1:
+                    file.write(',')
+            file.write('}')
 
 class PrimaryExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
+    def to_Verilog(self,file):
+        if self.flag == 'add brace':
+            file.write('(')
+            self.child[0].to_Verilog(file)
+            file.write(')')
+        else:
+            self.child[0].to_Verilog(file)
 
 class NumberNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        if isinstance(self.child[0],CircuitConstNode):
+            self.child[0].to_Verilog(file)
+        else:
+            file.write(self.child[0])
+
 
 
 class UnaryExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
+    def to_Verilog(self,file):
+        if self.flag == 'func no param':
+            file.write(self.child[0])
+            file.write('(')
+            file.write(')')
+        if self.flag == 'func with param':
+            file.write(self.child[0])
+            file.write('(')
+            self.child[1].to_Verilog(file)
+            file.write(')')
+        if self.flag == 'unaryOp':
+            self.child[0].to_Verilog(file)
+            self.child[1].to_Verilog(file)
+
+
+
 
 class UnaryOpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+
+    def to_Verilog(self,file):
+        file.write(self.child[0])
 
 
 class FuncRParamsNode(ASTNode):
@@ -324,45 +500,93 @@ class FuncRParamsNode(ASTNode):
 class MulExpExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
-
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 class AddExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 class ShiftExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 class RelExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 class EqExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
-
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 class RedExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 
 class LAndExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
 
 class LOrExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        if len(self.child) == 3:
+            self.child[0].to_Verilog(file)
+            file.write(self.child[1])
+            self.child[2].to_Verilog(file)
+        else:
+            self.child[0].to_Verilog(file)
 
-class ConnectExpNode(ASTNode):
-    def __init__(self, *childs):
-        super().__init__(*childs)
+
 class ConstExpNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
@@ -382,6 +606,11 @@ class CircuitConstNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
+    def to_Verilog(self,file):
+        self.child[0].to_Verilog(file)
+        file.write(self.child[1])
+
+
 
 class BinaryConstNode(ASTNode):
     def __init__(self, *childs):
@@ -393,12 +622,22 @@ class CirBasicTypeNode(ASTNode):
 
         self.type = ""
 
+    def to_Verilog(self,file):
+        file.write(self.type)
+
 class CirTypeNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
         self.type = ""
 
+    def to_Verilog(self,file):
+        self.type.to_Verilog(file)
+        if len(self.child) == 1:
+            #有exp
+            file.write('[')
+            self.child[0].to_Verilog(file)
+            file.write('-1:0]')
 
 class ValTypeNode(ASTNode):
     def __init__(self, *childs):
@@ -410,3 +649,11 @@ class ValTypeNode(ASTNode):
 class PortDefNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
+    def to_Verilog(self,file):
+        for c in self.child:
+            if isinstance(c,str):
+                file.write(c)
+            else:
+                c.to_Verilog(file)
+            file.write(' ')
+
