@@ -386,7 +386,7 @@ class ForStmtNode(ASTNode):
             #读出genvar
             gen_variable = self.child[0].child[1].identifier
             file.write(f'genvar {gen_variable};\n')
-            file.write('generate\n')
+            file.write('generate ')
             file.write(f'for ({gen_variable}=')
             self.child[0].child[1].child[1].child[0].to_Verilog(file)
             file.write(';')
