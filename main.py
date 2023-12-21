@@ -20,8 +20,8 @@ def test_file(filename, debug=False, encoding='utf-8'):
     f = open(filename, encoding=encoding)
     data = f.read()
     lexer = lex.lex(module=token_rules, debug=debug)
-    # lexer.input(data)
-    # print_token(lexer)
+    lexer.input(data)
+    print_token(lexer)
 
     parser1 = yacc.yacc()
     result = parser1.parse(input=data, lexer=lexer)

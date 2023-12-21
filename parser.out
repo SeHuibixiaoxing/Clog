@@ -103,8 +103,8 @@ Rule 97    elifStmt -> empty
 Rule 98    elseStmt -> ELSE stmt
 Rule 99    elseStmt -> empty
 Rule 100   ifStmt -> IF ( exp ) stmt elifStmt elseStmt
-Rule 101   forStmt -> FOR ( varDecl exp ; stmt ) stmt
-Rule 102   forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+Rule 101   forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt
+Rule 102   forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
 Rule 103   exp -> lOrExp
 Rule 104   lVal -> ID array_exp_repeat1
 Rule 105   lVal -> ID array_exp_repeat2
@@ -179,6 +179,7 @@ Terminals, with rules where they appear
 ,                    : 15 31 35 45 48 52 56 63 66 71 72 74 77 108 108 114 133
 .                    : 40 41 42 94 95 109
 ;                    : 16 36 39 57 84 85 86 92 101 102
+=                    : 101 102
 ADD                  : 128 142
 AND                  : 157
 ASSIGN               : 29 38 59 84
@@ -278,7 +279,7 @@ elifStmt             : 96 100
 elseStmt             : 100
 empty                : 2 14 27 30 34 44 47 51 55 62 65 70 73 76 79 97 99 113 115 117 132
 eqExp                : 154 154 155 155 156 157 158 159 160
-exp                  : 22 53 84 85 87 92 96 100 101 102 102 108 108 108 110 116 118 118 122 133 134 135 168
+exp                  : 22 53 84 85 87 92 96 100 101 101 102 102 108 108 108 110 116 118 118 122 133 134 135 168
 exp_repeat           : 133 135
 forStmt              : 91
 funcFParam           : 66 67
@@ -291,7 +292,7 @@ initVal              : 38 52 54 59
 initVal_repeat       : 52 54
 lAndExp              : 162 163 164
 lOrExp               : 103 164
-lVal                 : 84 85 109 111 114
+lVal                 : 84 85 101 102 109 111 114
 lVal_repeat          : 106 107 114
 modDecl              : 12
 module               : 7
@@ -308,7 +309,7 @@ redExp               : 157 158 159 160 161 162
 relExp               : 149 150 151 152 153
 seqLogStmt           : 89
 shiftExp             : 145 146 147 148
-stmt                 : 83 93 94 95 96 98 100 101 101 102
+stmt                 : 83 93 94 95 96 98 100 101 102
 type_def             : 68
 unaryExp             : 126 127 136 137 138 139 140
 unaryOp              : 127
@@ -5644,6 +5645,7 @@ state 155
     ELSE            reduce using rule 104 (lVal -> ID array_exp_repeat1 .)
     ASSIGN          reduce using rule 104 (lVal -> ID array_exp_repeat1 .)
     CONNECT         reduce using rule 104 (lVal -> ID array_exp_repeat1 .)
+    =               reduce using rule 104 (lVal -> ID array_exp_repeat1 .)
 
 
 state 156
@@ -5703,6 +5705,7 @@ state 156
     ELSE            reduce using rule 105 (lVal -> ID array_exp_repeat2 .)
     ASSIGN          reduce using rule 105 (lVal -> ID array_exp_repeat2 .)
     CONNECT         reduce using rule 105 (lVal -> ID array_exp_repeat2 .)
+    =               reduce using rule 105 (lVal -> ID array_exp_repeat2 .)
 
 
 state 157
@@ -5763,6 +5766,7 @@ state 157
   ! reduce/reduce conflict for ELSE resolved using rule 115 (array_exp_repeat1 -> empty .)
   ! reduce/reduce conflict for ASSIGN resolved using rule 115 (array_exp_repeat1 -> empty .)
   ! reduce/reduce conflict for CONNECT resolved using rule 115 (array_exp_repeat1 -> empty .)
+  ! reduce/reduce conflict for = resolved using rule 115 (array_exp_repeat1 -> empty .)
     .               reduce using rule 115 (array_exp_repeat1 -> empty .)
     MUL             reduce using rule 115 (array_exp_repeat1 -> empty .)
     DIV             reduce using rule 115 (array_exp_repeat1 -> empty .)
@@ -5816,6 +5820,7 @@ state 157
     ELSE            reduce using rule 115 (array_exp_repeat1 -> empty .)
     ASSIGN          reduce using rule 115 (array_exp_repeat1 -> empty .)
     CONNECT         reduce using rule 115 (array_exp_repeat1 -> empty .)
+    =               reduce using rule 115 (array_exp_repeat1 -> empty .)
 
   ! .               [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
   ! MUL             [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
@@ -5870,6 +5875,7 @@ state 157
   ! ELSE            [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
   ! ASSIGN          [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
   ! CONNECT         [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
+  ! =               [ reduce using rule 117 (array_exp_repeat2 -> empty .) ]
 
 
 state 158
@@ -8785,6 +8791,7 @@ state 223
     ELSE            reduce using rule 109 (lVal -> lVal . ID .)
     ASSIGN          reduce using rule 109 (lVal -> lVal . ID .)
     CONNECT         reduce using rule 109 (lVal -> lVal . ID .)
+    =               reduce using rule 109 (lVal -> lVal . ID .)
 
 
 state 224
@@ -8877,8 +8884,8 @@ state 228
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (23) val_type -> . INT
     (24) val_type -> . FLOAT
     (21) cir_type -> . cir_basic_type
@@ -9569,6 +9576,7 @@ state 256
     ELSE            reduce using rule 1 (empty -> .)
     ASSIGN          reduce using rule 1 (empty -> .)
     CONNECT         reduce using rule 1 (empty -> .)
+    =               reduce using rule 1 (empty -> .)
 
     array_exp_repeat1              shift and go to state 303
     empty                          shift and go to state 304
@@ -9875,8 +9883,8 @@ state 264
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (23) val_type -> . INT
     (24) val_type -> . FLOAT
     (21) cir_type -> . cir_basic_type
@@ -10042,8 +10050,8 @@ state 267
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (23) val_type -> . INT
     (24) val_type -> . FLOAT
     (21) cir_type -> . cir_basic_type
@@ -10272,7 +10280,6 @@ state 270
     }               reduce using rule 111 (primaryExp -> lVal .)
     ELIF            reduce using rule 111 (primaryExp -> lVal .)
     ELSE            reduce using rule 111 (primaryExp -> lVal .)
-    )               reduce using rule 111 (primaryExp -> lVal .)
 
 
 state 271
@@ -10306,7 +10313,6 @@ state 271
     }               reduce using rule 87 (stmt -> exp .)
     ELIF            reduce using rule 87 (stmt -> exp .)
     ELSE            reduce using rule 87 (stmt -> exp .)
-    )               reduce using rule 87 (stmt -> exp .)
     BIT_WIDTH_NUMBER shift and go to state 132
 
 
@@ -10340,7 +10346,6 @@ state 272
     }               reduce using rule 86 (stmt -> ; .)
     ELIF            reduce using rule 86 (stmt -> ; .)
     ELSE            reduce using rule 86 (stmt -> ; .)
-    )               reduce using rule 86 (stmt -> ; .)
 
 
 state 273
@@ -10373,7 +10378,6 @@ state 273
     }               reduce using rule 88 (stmt -> block .)
     ELIF            reduce using rule 88 (stmt -> block .)
     ELSE            reduce using rule 88 (stmt -> block .)
-    )               reduce using rule 88 (stmt -> block .)
 
 
 state 274
@@ -10406,7 +10410,6 @@ state 274
     }               reduce using rule 89 (stmt -> seqLogStmt .)
     ELIF            reduce using rule 89 (stmt -> seqLogStmt .)
     ELSE            reduce using rule 89 (stmt -> seqLogStmt .)
-    )               reduce using rule 89 (stmt -> seqLogStmt .)
 
 
 state 275
@@ -10439,7 +10442,6 @@ state 275
     }               reduce using rule 90 (stmt -> ifStmt .)
     ELIF            reduce using rule 90 (stmt -> ifStmt .)
     ELSE            reduce using rule 90 (stmt -> ifStmt .)
-    )               reduce using rule 90 (stmt -> ifStmt .)
 
 
 state 276
@@ -10472,7 +10474,6 @@ state 276
     }               reduce using rule 91 (stmt -> forStmt .)
     ELIF            reduce using rule 91 (stmt -> forStmt .)
     ELSE            reduce using rule 91 (stmt -> forStmt .)
-    )               reduce using rule 91 (stmt -> forStmt .)
 
 
 state 277
@@ -10676,14 +10677,14 @@ state 282
 
 state 283
 
-    (101) forStmt -> FOR . ( varDecl exp ; stmt ) stmt
+    (101) forStmt -> FOR . ( varDecl exp ; lVal = exp ) stmt
 
     (               shift and go to state 320
 
 
 state 284
 
-    (102) forStmt -> GENERATE . FOR ( varDecl exp ; exp ) COLON ID stmt
+    (102) forStmt -> GENERATE . FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
 
     FOR             shift and go to state 321
 
@@ -11217,6 +11218,7 @@ state 303
     ELSE            reduce using rule 116 (array_exp_repeat1 -> [ exp ] array_exp_repeat1 .)
     ASSIGN          reduce using rule 116 (array_exp_repeat1 -> [ exp ] array_exp_repeat1 .)
     CONNECT         reduce using rule 116 (array_exp_repeat1 -> [ exp ] array_exp_repeat1 .)
+    =               reduce using rule 116 (array_exp_repeat1 -> [ exp ] array_exp_repeat1 .)
 
 
 state 304
@@ -11276,6 +11278,7 @@ state 304
     ELSE            reduce using rule 115 (array_exp_repeat1 -> empty .)
     ASSIGN          reduce using rule 115 (array_exp_repeat1 -> empty .)
     CONNECT         reduce using rule 115 (array_exp_repeat1 -> empty .)
+    =               reduce using rule 115 (array_exp_repeat1 -> empty .)
 
 
 state 305
@@ -11344,6 +11347,7 @@ state 306
     ELSE            reduce using rule 106 (lVal -> { ID array_exp_repeat1 lVal_repeat } .)
     ASSIGN          reduce using rule 106 (lVal -> { ID array_exp_repeat1 lVal_repeat } .)
     CONNECT         reduce using rule 106 (lVal -> { ID array_exp_repeat1 lVal_repeat } .)
+    =               reduce using rule 106 (lVal -> { ID array_exp_repeat1 lVal_repeat } .)
 
 
 state 307
@@ -11375,6 +11379,7 @@ state 308
     .               reduce using rule 1 (empty -> .)
     ,               reduce using rule 1 (empty -> .)
     }               reduce using rule 1 (empty -> .)
+    =               reduce using rule 1 (empty -> .)
 
     array_exp_repeat1              shift and go to state 155
     array_exp_repeat2              shift and go to state 156
@@ -11437,6 +11442,7 @@ state 309
     ELSE            reduce using rule 107 (lVal -> { ID array_exp_repeat2 lVal_repeat } .)
     ASSIGN          reduce using rule 107 (lVal -> { ID array_exp_repeat2 lVal_repeat } .)
     CONNECT         reduce using rule 107 (lVal -> { ID array_exp_repeat2 lVal_repeat } .)
+    =               reduce using rule 107 (lVal -> { ID array_exp_repeat2 lVal_repeat } .)
 
 
 state 310
@@ -11563,7 +11569,6 @@ state 312
     }               reduce using rule 81 (block -> { block_repeat } .)
     ELIF            reduce using rule 81 (block -> { block_repeat } .)
     ELSE            reduce using rule 81 (block -> { block_repeat } .)
-    )               reduce using rule 81 (block -> { block_repeat } .)
 
 
 state 313
@@ -11946,7 +11951,7 @@ state 319
 
 state 320
 
-    (101) forStmt -> FOR ( . varDecl exp ; stmt ) stmt
+    (101) forStmt -> FOR ( . varDecl exp ; lVal = exp ) stmt
     (36) varDecl -> . val_type varDef varDef_repeat ;
     (23) val_type -> . INT
     (24) val_type -> . FLOAT
@@ -11959,7 +11964,7 @@ state 320
 
 state 321
 
-    (102) forStmt -> GENERATE FOR . ( varDecl exp ; exp ) COLON ID stmt
+    (102) forStmt -> GENERATE FOR . ( varDecl exp ; lVal = exp ) COLON ID stmt
 
     (               shift and go to state 342
 
@@ -12204,6 +12209,7 @@ state 333
     ELSE            reduce using rule 1 (empty -> .)
     ASSIGN          reduce using rule 1 (empty -> .)
     CONNECT         reduce using rule 1 (empty -> .)
+    =               reduce using rule 1 (empty -> .)
 
     array_exp_repeat2              shift and go to state 350
     empty                          shift and go to state 351
@@ -12347,7 +12353,6 @@ state 338
     }               reduce using rule 92 (stmt -> RETURN exp ; .)
     ELIF            reduce using rule 92 (stmt -> RETURN exp ; .)
     ELSE            reduce using rule 92 (stmt -> RETURN exp ; .)
-    )               reduce using rule 92 (stmt -> RETURN exp ; .)
 
 
 state 339
@@ -12371,7 +12376,7 @@ state 340
 
 state 341
 
-    (101) forStmt -> FOR ( varDecl . exp ; stmt ) stmt
+    (101) forStmt -> FOR ( varDecl . exp ; lVal = exp ) stmt
     (103) exp -> . lOrExp
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
@@ -12438,6 +12443,7 @@ state 341
     FLOAT_CONST     shift and go to state 93
 
     exp                            shift and go to state 358
+    lVal                           shift and go to state 86
     lOrExp                         shift and go to state 70
     lAndExp                        shift and go to state 71
     redExp                         shift and go to state 72
@@ -12449,13 +12455,12 @@ state 341
     unaryExp                       shift and go to state 80
     primaryExp                     shift and go to state 81
     unaryOp                        shift and go to state 85
-    lVal                           shift and go to state 86
     number                         shift and go to state 87
     circuit_const                  shift and go to state 94
 
 state 342
 
-    (102) forStmt -> GENERATE FOR ( . varDecl exp ; exp ) COLON ID stmt
+    (102) forStmt -> GENERATE FOR ( . varDecl exp ; lVal = exp ) COLON ID stmt
     (36) varDecl -> . val_type varDef varDef_repeat ;
     (23) val_type -> . INT
     (24) val_type -> . FLOAT
@@ -12672,6 +12677,7 @@ state 350
     ELSE            reduce using rule 118 (array_exp_repeat2 -> [ exp COLON exp ] array_exp_repeat2 .)
     ASSIGN          reduce using rule 118 (array_exp_repeat2 -> [ exp COLON exp ] array_exp_repeat2 .)
     CONNECT         reduce using rule 118 (array_exp_repeat2 -> [ exp COLON exp ] array_exp_repeat2 .)
+    =               reduce using rule 118 (array_exp_repeat2 -> [ exp COLON exp ] array_exp_repeat2 .)
 
 
 state 351
@@ -12731,6 +12737,7 @@ state 351
     ELSE            reduce using rule 117 (array_exp_repeat2 -> empty .)
     ASSIGN          reduce using rule 117 (array_exp_repeat2 -> empty .)
     CONNECT         reduce using rule 117 (array_exp_repeat2 -> empty .)
+    =               reduce using rule 117 (array_exp_repeat2 -> empty .)
 
 
 state 352
@@ -12772,7 +12779,6 @@ state 353
     }               reduce using rule 84 (stmt -> lVal ASSIGN exp ; .)
     ELIF            reduce using rule 84 (stmt -> lVal ASSIGN exp ; .)
     ELSE            reduce using rule 84 (stmt -> lVal ASSIGN exp ; .)
-    )               reduce using rule 84 (stmt -> lVal ASSIGN exp ; .)
 
 
 state 354
@@ -12805,7 +12811,6 @@ state 354
     }               reduce using rule 85 (stmt -> lVal CONNECT exp ; .)
     ELIF            reduce using rule 85 (stmt -> lVal CONNECT exp ; .)
     ELSE            reduce using rule 85 (stmt -> lVal CONNECT exp ; .)
-    )               reduce using rule 85 (stmt -> lVal CONNECT exp ; .)
 
 
 state 355
@@ -12832,8 +12837,8 @@ state 355
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -12952,8 +12957,8 @@ state 357
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -13041,7 +13046,7 @@ state 357
 
 state 358
 
-    (101) forStmt -> FOR ( varDecl exp . ; stmt ) stmt
+    (101) forStmt -> FOR ( varDecl exp . ; lVal = exp ) stmt
     (122) circuit_const -> exp . BIT_WIDTH_NUMBER
 
     ;               shift and go to state 369
@@ -13050,7 +13055,7 @@ state 358
 
 state 359
 
-    (102) forStmt -> GENERATE FOR ( varDecl . exp ; exp ) COLON ID stmt
+    (102) forStmt -> GENERATE FOR ( varDecl . exp ; lVal = exp ) COLON ID stmt
     (103) exp -> . lOrExp
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
@@ -13117,6 +13122,7 @@ state 359
     FLOAT_CONST     shift and go to state 93
 
     exp                            shift and go to state 370
+    lVal                           shift and go to state 86
     lOrExp                         shift and go to state 70
     lAndExp                        shift and go to state 71
     redExp                         shift and go to state 72
@@ -13128,7 +13134,6 @@ state 359
     unaryExp                       shift and go to state 80
     primaryExp                     shift and go to state 81
     unaryOp                        shift and go to state 85
-    lVal                           shift and go to state 86
     number                         shift and go to state 87
     circuit_const                  shift and go to state 94
 
@@ -13212,6 +13217,7 @@ state 363
     ELSE            reduce using rule 108 (lVal -> MUX ( exp , exp , exp ) .)
     ASSIGN          reduce using rule 108 (lVal -> MUX ( exp , exp , exp ) .)
     CONNECT         reduce using rule 108 (lVal -> MUX ( exp , exp , exp ) .)
+    =               reduce using rule 108 (lVal -> MUX ( exp , exp , exp ) .)
 
 
 state 364
@@ -13277,7 +13283,6 @@ state 364
     }               reduce using rule 1 (empty -> .)
     ELIF            reduce using rule 1 (empty -> .)
     ELSE            reduce using rule 1 (empty -> .)
-    )               reduce using rule 1 (empty -> .)
 
   ! (               [ reduce using rule 1 (empty -> .) ]
 
@@ -13315,7 +13320,6 @@ state 365
     }               reduce using rule 93 (seqLogStmt -> WHEN ( ID ) stmt .)
     ELIF            reduce using rule 93 (seqLogStmt -> WHEN ( ID ) stmt .)
     ELSE            reduce using rule 93 (seqLogStmt -> WHEN ( ID ) stmt .)
-    )               reduce using rule 93 (seqLogStmt -> WHEN ( ID ) stmt .)
 
 
 state 366
@@ -13366,7 +13370,6 @@ state 368
     FLOAT_CONST     reduce using rule 1 (empty -> .)
     }               reduce using rule 1 (empty -> .)
     ELSE            reduce using rule 1 (empty -> .)
-    )               reduce using rule 1 (empty -> .)
 
   ! ELIF            [ reduce using rule 1 (empty -> .) ]
 
@@ -13375,118 +13378,23 @@ state 368
 
 state 369
 
-    (101) forStmt -> FOR ( varDecl exp ; . stmt ) stmt
-    (84) stmt -> . lVal ASSIGN exp ;
-    (85) stmt -> . lVal CONNECT exp ;
-    (86) stmt -> . ;
-    (87) stmt -> . exp
-    (88) stmt -> . block
-    (89) stmt -> . seqLogStmt
-    (90) stmt -> . ifStmt
-    (91) stmt -> . forStmt
-    (92) stmt -> . RETURN exp ;
+    (101) forStmt -> FOR ( varDecl exp ; . lVal = exp ) stmt
     (104) lVal -> . ID array_exp_repeat1
     (105) lVal -> . ID array_exp_repeat2
     (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
     (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
     (108) lVal -> . MUX ( exp , exp , exp )
     (109) lVal -> . lVal . ID
-    (103) exp -> . lOrExp
-    (81) block -> . { block_repeat }
-    (93) seqLogStmt -> . WHEN ( ID ) stmt
-    (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
-    (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
-    (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
-    (163) lOrExp -> . lAndExp
-    (164) lOrExp -> . lOrExp LOR lAndExp
-    (161) lAndExp -> . redExp
-    (162) lAndExp -> . lAndExp LAND redExp
-    (156) redExp -> . eqExp
-    (157) redExp -> . redExp AND eqExp
-    (158) redExp -> . redExp OR eqExp
-    (159) redExp -> . redExp XOR eqExp
-    (160) redExp -> . redExp XNOR eqExp
-    (153) eqExp -> . relExp
-    (154) eqExp -> . eqExp EQUAL eqExp
-    (155) eqExp -> . eqExp NEQ eqExp
-    (148) relExp -> . shiftExp
-    (149) relExp -> . relExp LT addExp
-    (150) relExp -> . relExp GT addExp
-    (151) relExp -> . relExp GE addExp
-    (152) relExp -> . relExp LE addExp
-    (144) shiftExp -> . addExp
-    (145) shiftExp -> . shiftExp SLL addExp
-    (146) shiftExp -> . shiftExp SRL addExp
-    (147) shiftExp -> . shiftExp SRA addExp
-    (141) addExp -> . mulExp
-    (142) addExp -> . addExp ADD mulExp
-    (143) addExp -> . addExp SUB mulExp
-    (136) mulExp -> . unaryExp
-    (137) mulExp -> . mulExp MUL unaryExp
-    (138) mulExp -> . mulExp DIV unaryExp
-    (139) mulExp -> . mulExp MOD unaryExp
-    (140) mulExp -> . mulExp POWER unaryExp
-    (123) unaryExp -> . primaryExp
-    (124) unaryExp -> . ID ( )
-    (125) unaryExp -> . ID ( funcRParams )
-    (126) unaryExp -> . SIGNAL ( unaryExp )
-    (127) unaryExp -> . unaryOp unaryExp
-    (110) primaryExp -> . ( exp )
-    (111) primaryExp -> . lVal
-    (112) primaryExp -> . number
-    (128) unaryOp -> . ADD
-    (129) unaryOp -> . SUB
-    (130) unaryOp -> . NOT
-    (131) unaryOp -> . NOTL
-    (119) number -> . INTEGER_CONST
-    (120) number -> . FLOAT_CONST
-    (121) number -> . circuit_const
-    (122) circuit_const -> . exp BIT_WIDTH_NUMBER
 
-    ;               shift and go to state 272
-    RETURN          shift and go to state 277
-    ID              shift and go to state 364
-    {               shift and go to state 264
+    ID              shift and go to state 308
+    {               shift and go to state 90
     MUX             shift and go to state 91
-    WHEN            shift and go to state 281
-    IF              shift and go to state 282
-    FOR             shift and go to state 283
-    GENERATE        shift and go to state 284
-    SIGNAL          shift and go to state 84
-    (               shift and go to state 83
-    ADD             shift and go to state 78
-    SUB             shift and go to state 79
-    NOT             shift and go to state 88
-    NOTL            shift and go to state 89
-    INTEGER_CONST   shift and go to state 92
-    FLOAT_CONST     shift and go to state 93
 
-    exp                            shift and go to state 271
-    stmt                           shift and go to state 376
-    lVal                           shift and go to state 270
-    block                          shift and go to state 273
-    seqLogStmt                     shift and go to state 274
-    ifStmt                         shift and go to state 275
-    forStmt                        shift and go to state 276
-    lOrExp                         shift and go to state 70
-    lAndExp                        shift and go to state 71
-    redExp                         shift and go to state 72
-    eqExp                          shift and go to state 73
-    relExp                         shift and go to state 74
-    shiftExp                       shift and go to state 75
-    addExp                         shift and go to state 76
-    mulExp                         shift and go to state 77
-    unaryExp                       shift and go to state 80
-    primaryExp                     shift and go to state 81
-    unaryOp                        shift and go to state 85
-    number                         shift and go to state 87
-    circuit_const                  shift and go to state 94
+    lVal                           shift and go to state 376
 
 state 370
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp . ; exp ) COLON ID stmt
+    (102) forStmt -> GENERATE FOR ( varDecl exp . ; lVal = exp ) COLON ID stmt
     (122) circuit_const -> exp . BIT_WIDTH_NUMBER
 
     ;               shift and go to state 377
@@ -13517,8 +13425,8 @@ state 371
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -13628,8 +13536,8 @@ state 372
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -13749,7 +13657,6 @@ state 373
     FLOAT_CONST     reduce using rule 1 (empty -> .)
     }               reduce using rule 1 (empty -> .)
     ELIF            reduce using rule 1 (empty -> .)
-    )               reduce using rule 1 (empty -> .)
 
   ! ELSE            [ reduce using rule 1 (empty -> .) ]
 
@@ -13793,99 +13700,32 @@ state 375
     }               reduce using rule 97 (elifStmt -> empty .)
     ELIF            reduce using rule 97 (elifStmt -> empty .)
     ELSE            reduce using rule 97 (elifStmt -> empty .)
-    )               reduce using rule 97 (elifStmt -> empty .)
 
 
 state 376
 
-    (101) forStmt -> FOR ( varDecl exp ; stmt . ) stmt
+    (101) forStmt -> FOR ( varDecl exp ; lVal . = exp ) stmt
+    (109) lVal -> lVal . . ID
 
-    )               shift and go to state 384
+    =               shift and go to state 384
+    .               shift and go to state 163
 
 
 state 377
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; . exp ) COLON ID stmt
-    (103) exp -> . lOrExp
-    (163) lOrExp -> . lAndExp
-    (164) lOrExp -> . lOrExp LOR lAndExp
-    (161) lAndExp -> . redExp
-    (162) lAndExp -> . lAndExp LAND redExp
-    (156) redExp -> . eqExp
-    (157) redExp -> . redExp AND eqExp
-    (158) redExp -> . redExp OR eqExp
-    (159) redExp -> . redExp XOR eqExp
-    (160) redExp -> . redExp XNOR eqExp
-    (153) eqExp -> . relExp
-    (154) eqExp -> . eqExp EQUAL eqExp
-    (155) eqExp -> . eqExp NEQ eqExp
-    (148) relExp -> . shiftExp
-    (149) relExp -> . relExp LT addExp
-    (150) relExp -> . relExp GT addExp
-    (151) relExp -> . relExp GE addExp
-    (152) relExp -> . relExp LE addExp
-    (144) shiftExp -> . addExp
-    (145) shiftExp -> . shiftExp SLL addExp
-    (146) shiftExp -> . shiftExp SRL addExp
-    (147) shiftExp -> . shiftExp SRA addExp
-    (141) addExp -> . mulExp
-    (142) addExp -> . addExp ADD mulExp
-    (143) addExp -> . addExp SUB mulExp
-    (136) mulExp -> . unaryExp
-    (137) mulExp -> . mulExp MUL unaryExp
-    (138) mulExp -> . mulExp DIV unaryExp
-    (139) mulExp -> . mulExp MOD unaryExp
-    (140) mulExp -> . mulExp POWER unaryExp
-    (123) unaryExp -> . primaryExp
-    (124) unaryExp -> . ID ( )
-    (125) unaryExp -> . ID ( funcRParams )
-    (126) unaryExp -> . SIGNAL ( unaryExp )
-    (127) unaryExp -> . unaryOp unaryExp
-    (110) primaryExp -> . ( exp )
-    (111) primaryExp -> . lVal
-    (112) primaryExp -> . number
-    (128) unaryOp -> . ADD
-    (129) unaryOp -> . SUB
-    (130) unaryOp -> . NOT
-    (131) unaryOp -> . NOTL
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; . lVal = exp ) COLON ID stmt
     (104) lVal -> . ID array_exp_repeat1
     (105) lVal -> . ID array_exp_repeat2
     (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
     (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
     (108) lVal -> . MUX ( exp , exp , exp )
     (109) lVal -> . lVal . ID
-    (119) number -> . INTEGER_CONST
-    (120) number -> . FLOAT_CONST
-    (121) number -> . circuit_const
-    (122) circuit_const -> . exp BIT_WIDTH_NUMBER
 
-    ID              shift and go to state 82
-    SIGNAL          shift and go to state 84
-    (               shift and go to state 83
-    ADD             shift and go to state 78
-    SUB             shift and go to state 79
-    NOT             shift and go to state 88
-    NOTL            shift and go to state 89
+    ID              shift and go to state 308
     {               shift and go to state 90
     MUX             shift and go to state 91
-    INTEGER_CONST   shift and go to state 92
-    FLOAT_CONST     shift and go to state 93
 
-    exp                            shift and go to state 385
-    lOrExp                         shift and go to state 70
-    lAndExp                        shift and go to state 71
-    redExp                         shift and go to state 72
-    eqExp                          shift and go to state 73
-    relExp                         shift and go to state 74
-    shiftExp                       shift and go to state 75
-    addExp                         shift and go to state 76
-    mulExp                         shift and go to state 77
-    unaryExp                       shift and go to state 80
-    primaryExp                     shift and go to state 81
-    unaryOp                        shift and go to state 85
-    lVal                           shift and go to state 86
-    number                         shift and go to state 87
-    circuit_const                  shift and go to state 94
+    lVal                           shift and go to state 385
 
 state 378
 
@@ -13917,7 +13757,6 @@ state 378
     }               reduce using rule 94 (seqLogStmt -> WHEN ( ID . RISING ) stmt .)
     ELIF            reduce using rule 94 (seqLogStmt -> WHEN ( ID . RISING ) stmt .)
     ELSE            reduce using rule 94 (seqLogStmt -> WHEN ( ID . RISING ) stmt .)
-    )               reduce using rule 94 (seqLogStmt -> WHEN ( ID . RISING ) stmt .)
 
 
 state 379
@@ -13950,7 +13789,6 @@ state 379
     }               reduce using rule 95 (seqLogStmt -> WHEN ( ID . FALLING ) stmt .)
     ELIF            reduce using rule 95 (seqLogStmt -> WHEN ( ID . FALLING ) stmt .)
     ELSE            reduce using rule 95 (seqLogStmt -> WHEN ( ID . FALLING ) stmt .)
-    )               reduce using rule 95 (seqLogStmt -> WHEN ( ID . FALLING ) stmt .)
 
 
 state 380
@@ -13983,7 +13821,6 @@ state 380
     }               reduce using rule 100 (ifStmt -> IF ( exp ) stmt elifStmt elseStmt .)
     ELIF            reduce using rule 100 (ifStmt -> IF ( exp ) stmt elifStmt elseStmt .)
     ELSE            reduce using rule 100 (ifStmt -> IF ( exp ) stmt elifStmt elseStmt .)
-    )               reduce using rule 100 (ifStmt -> IF ( exp ) stmt elifStmt elseStmt .)
 
 
 state 381
@@ -14010,8 +13847,8 @@ state 381
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -14127,7 +13964,6 @@ state 382
     }               reduce using rule 99 (elseStmt -> empty .)
     ELIF            reduce using rule 99 (elseStmt -> empty .)
     ELSE            reduce using rule 99 (elseStmt -> empty .)
-    )               reduce using rule 99 (elseStmt -> empty .)
 
 
 state 383
@@ -14216,30 +14052,8 @@ state 383
 
 state 384
 
-    (101) forStmt -> FOR ( varDecl exp ; stmt ) . stmt
-    (84) stmt -> . lVal ASSIGN exp ;
-    (85) stmt -> . lVal CONNECT exp ;
-    (86) stmt -> . ;
-    (87) stmt -> . exp
-    (88) stmt -> . block
-    (89) stmt -> . seqLogStmt
-    (90) stmt -> . ifStmt
-    (91) stmt -> . forStmt
-    (92) stmt -> . RETURN exp ;
-    (104) lVal -> . ID array_exp_repeat1
-    (105) lVal -> . ID array_exp_repeat2
-    (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
-    (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
-    (108) lVal -> . MUX ( exp , exp , exp )
-    (109) lVal -> . lVal . ID
+    (101) forStmt -> FOR ( varDecl exp ; lVal = . exp ) stmt
     (103) exp -> . lOrExp
-    (81) block -> . { block_repeat }
-    (93) seqLogStmt -> . WHEN ( ID ) stmt
-    (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
-    (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
-    (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -14281,36 +14095,31 @@ state 384
     (129) unaryOp -> . SUB
     (130) unaryOp -> . NOT
     (131) unaryOp -> . NOTL
+    (104) lVal -> . ID array_exp_repeat1
+    (105) lVal -> . ID array_exp_repeat2
+    (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
+    (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
+    (108) lVal -> . MUX ( exp , exp , exp )
+    (109) lVal -> . lVal . ID
     (119) number -> . INTEGER_CONST
     (120) number -> . FLOAT_CONST
     (121) number -> . circuit_const
     (122) circuit_const -> . exp BIT_WIDTH_NUMBER
 
-    ;               shift and go to state 272
-    RETURN          shift and go to state 277
-    ID              shift and go to state 364
-    {               shift and go to state 264
-    MUX             shift and go to state 91
-    WHEN            shift and go to state 281
-    IF              shift and go to state 282
-    FOR             shift and go to state 283
-    GENERATE        shift and go to state 284
+    ID              shift and go to state 82
     SIGNAL          shift and go to state 84
     (               shift and go to state 83
     ADD             shift and go to state 78
     SUB             shift and go to state 79
     NOT             shift and go to state 88
     NOTL            shift and go to state 89
+    {               shift and go to state 90
+    MUX             shift and go to state 91
     INTEGER_CONST   shift and go to state 92
     FLOAT_CONST     shift and go to state 93
 
-    exp                            shift and go to state 271
-    stmt                           shift and go to state 388
-    lVal                           shift and go to state 270
-    block                          shift and go to state 273
-    seqLogStmt                     shift and go to state 274
-    ifStmt                         shift and go to state 275
-    forStmt                        shift and go to state 276
+    exp                            shift and go to state 388
+    lVal                           shift and go to state 86
     lOrExp                         shift and go to state 70
     lAndExp                        shift and go to state 71
     redExp                         shift and go to state 72
@@ -14327,11 +14136,11 @@ state 384
 
 state 385
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; exp . ) COLON ID stmt
-    (122) circuit_const -> exp . BIT_WIDTH_NUMBER
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal . = exp ) COLON ID stmt
+    (109) lVal -> lVal . . ID
 
-    )               shift and go to state 389
-    BIT_WIDTH_NUMBER shift and go to state 132
+    =               shift and go to state 389
+    .               shift and go to state 163
 
 
 state 386
@@ -14364,7 +14173,6 @@ state 386
     }               reduce using rule 98 (elseStmt -> ELSE stmt .)
     ELIF            reduce using rule 98 (elseStmt -> ELSE stmt .)
     ELSE            reduce using rule 98 (elseStmt -> ELSE stmt .)
-    )               reduce using rule 98 (elseStmt -> ELSE stmt .)
 
 
 state 387
@@ -14378,43 +14186,96 @@ state 387
 
 state 388
 
-    (101) forStmt -> FOR ( varDecl exp ; stmt ) stmt .
+    (101) forStmt -> FOR ( varDecl exp ; lVal = exp . ) stmt
+    (122) circuit_const -> exp . BIT_WIDTH_NUMBER
 
-    ;               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    RETURN          reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    CONST           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    ID              reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    {               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    MUX             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    WHEN            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    IF              reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    FOR             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    GENERATE        reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    INT             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    FLOAT           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    REG             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    WIRE            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    CLOCK           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    SIGNAL          reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    (               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    ADD             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    SUB             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    NOT             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    NOTL            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    INTEGER_CONST   reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    FLOAT_CONST     reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    }               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    ELIF            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    ELSE            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
-    )               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; stmt ) stmt .)
+    )               shift and go to state 391
+    BIT_WIDTH_NUMBER shift and go to state 132
 
 
 state 389
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; exp ) . COLON ID stmt
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = . exp ) COLON ID stmt
+    (103) exp -> . lOrExp
+    (163) lOrExp -> . lAndExp
+    (164) lOrExp -> . lOrExp LOR lAndExp
+    (161) lAndExp -> . redExp
+    (162) lAndExp -> . lAndExp LAND redExp
+    (156) redExp -> . eqExp
+    (157) redExp -> . redExp AND eqExp
+    (158) redExp -> . redExp OR eqExp
+    (159) redExp -> . redExp XOR eqExp
+    (160) redExp -> . redExp XNOR eqExp
+    (153) eqExp -> . relExp
+    (154) eqExp -> . eqExp EQUAL eqExp
+    (155) eqExp -> . eqExp NEQ eqExp
+    (148) relExp -> . shiftExp
+    (149) relExp -> . relExp LT addExp
+    (150) relExp -> . relExp GT addExp
+    (151) relExp -> . relExp GE addExp
+    (152) relExp -> . relExp LE addExp
+    (144) shiftExp -> . addExp
+    (145) shiftExp -> . shiftExp SLL addExp
+    (146) shiftExp -> . shiftExp SRL addExp
+    (147) shiftExp -> . shiftExp SRA addExp
+    (141) addExp -> . mulExp
+    (142) addExp -> . addExp ADD mulExp
+    (143) addExp -> . addExp SUB mulExp
+    (136) mulExp -> . unaryExp
+    (137) mulExp -> . mulExp MUL unaryExp
+    (138) mulExp -> . mulExp DIV unaryExp
+    (139) mulExp -> . mulExp MOD unaryExp
+    (140) mulExp -> . mulExp POWER unaryExp
+    (123) unaryExp -> . primaryExp
+    (124) unaryExp -> . ID ( )
+    (125) unaryExp -> . ID ( funcRParams )
+    (126) unaryExp -> . SIGNAL ( unaryExp )
+    (127) unaryExp -> . unaryOp unaryExp
+    (110) primaryExp -> . ( exp )
+    (111) primaryExp -> . lVal
+    (112) primaryExp -> . number
+    (128) unaryOp -> . ADD
+    (129) unaryOp -> . SUB
+    (130) unaryOp -> . NOT
+    (131) unaryOp -> . NOTL
+    (104) lVal -> . ID array_exp_repeat1
+    (105) lVal -> . ID array_exp_repeat2
+    (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
+    (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
+    (108) lVal -> . MUX ( exp , exp , exp )
+    (109) lVal -> . lVal . ID
+    (119) number -> . INTEGER_CONST
+    (120) number -> . FLOAT_CONST
+    (121) number -> . circuit_const
+    (122) circuit_const -> . exp BIT_WIDTH_NUMBER
 
-    COLON           shift and go to state 391
+    ID              shift and go to state 82
+    SIGNAL          shift and go to state 84
+    (               shift and go to state 83
+    ADD             shift and go to state 78
+    SUB             shift and go to state 79
+    NOT             shift and go to state 88
+    NOTL            shift and go to state 89
+    {               shift and go to state 90
+    MUX             shift and go to state 91
+    INTEGER_CONST   shift and go to state 92
+    FLOAT_CONST     shift and go to state 93
 
+    exp                            shift and go to state 392
+    lVal                           shift and go to state 86
+    lOrExp                         shift and go to state 70
+    lAndExp                        shift and go to state 71
+    redExp                         shift and go to state 72
+    eqExp                          shift and go to state 73
+    relExp                         shift and go to state 74
+    shiftExp                       shift and go to state 75
+    addExp                         shift and go to state 76
+    mulExp                         shift and go to state 77
+    unaryExp                       shift and go to state 80
+    primaryExp                     shift and go to state 81
+    unaryOp                        shift and go to state 85
+    number                         shift and go to state 87
+    circuit_const                  shift and go to state 94
 
 state 390
 
@@ -14440,8 +14301,8 @@ state 390
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -14507,7 +14368,7 @@ state 390
     FLOAT_CONST     shift and go to state 93
 
     exp                            shift and go to state 271
-    stmt                           shift and go to state 392
+    stmt                           shift and go to state 393
     lVal                           shift and go to state 270
     block                          shift and go to state 273
     seqLogStmt                     shift and go to state 274
@@ -14529,12 +14390,125 @@ state 390
 
 state 391
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON . ID stmt
+    (101) forStmt -> FOR ( varDecl exp ; lVal = exp ) . stmt
+    (84) stmt -> . lVal ASSIGN exp ;
+    (85) stmt -> . lVal CONNECT exp ;
+    (86) stmt -> . ;
+    (87) stmt -> . exp
+    (88) stmt -> . block
+    (89) stmt -> . seqLogStmt
+    (90) stmt -> . ifStmt
+    (91) stmt -> . forStmt
+    (92) stmt -> . RETURN exp ;
+    (104) lVal -> . ID array_exp_repeat1
+    (105) lVal -> . ID array_exp_repeat2
+    (106) lVal -> . { ID array_exp_repeat1 lVal_repeat }
+    (107) lVal -> . { ID array_exp_repeat2 lVal_repeat }
+    (108) lVal -> . MUX ( exp , exp , exp )
+    (109) lVal -> . lVal . ID
+    (103) exp -> . lOrExp
+    (81) block -> . { block_repeat }
+    (93) seqLogStmt -> . WHEN ( ID ) stmt
+    (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
+    (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
+    (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
+    (163) lOrExp -> . lAndExp
+    (164) lOrExp -> . lOrExp LOR lAndExp
+    (161) lAndExp -> . redExp
+    (162) lAndExp -> . lAndExp LAND redExp
+    (156) redExp -> . eqExp
+    (157) redExp -> . redExp AND eqExp
+    (158) redExp -> . redExp OR eqExp
+    (159) redExp -> . redExp XOR eqExp
+    (160) redExp -> . redExp XNOR eqExp
+    (153) eqExp -> . relExp
+    (154) eqExp -> . eqExp EQUAL eqExp
+    (155) eqExp -> . eqExp NEQ eqExp
+    (148) relExp -> . shiftExp
+    (149) relExp -> . relExp LT addExp
+    (150) relExp -> . relExp GT addExp
+    (151) relExp -> . relExp GE addExp
+    (152) relExp -> . relExp LE addExp
+    (144) shiftExp -> . addExp
+    (145) shiftExp -> . shiftExp SLL addExp
+    (146) shiftExp -> . shiftExp SRL addExp
+    (147) shiftExp -> . shiftExp SRA addExp
+    (141) addExp -> . mulExp
+    (142) addExp -> . addExp ADD mulExp
+    (143) addExp -> . addExp SUB mulExp
+    (136) mulExp -> . unaryExp
+    (137) mulExp -> . mulExp MUL unaryExp
+    (138) mulExp -> . mulExp DIV unaryExp
+    (139) mulExp -> . mulExp MOD unaryExp
+    (140) mulExp -> . mulExp POWER unaryExp
+    (123) unaryExp -> . primaryExp
+    (124) unaryExp -> . ID ( )
+    (125) unaryExp -> . ID ( funcRParams )
+    (126) unaryExp -> . SIGNAL ( unaryExp )
+    (127) unaryExp -> . unaryOp unaryExp
+    (110) primaryExp -> . ( exp )
+    (111) primaryExp -> . lVal
+    (112) primaryExp -> . number
+    (128) unaryOp -> . ADD
+    (129) unaryOp -> . SUB
+    (130) unaryOp -> . NOT
+    (131) unaryOp -> . NOTL
+    (119) number -> . INTEGER_CONST
+    (120) number -> . FLOAT_CONST
+    (121) number -> . circuit_const
+    (122) circuit_const -> . exp BIT_WIDTH_NUMBER
 
-    ID              shift and go to state 393
+    ;               shift and go to state 272
+    RETURN          shift and go to state 277
+    ID              shift and go to state 364
+    {               shift and go to state 264
+    MUX             shift and go to state 91
+    WHEN            shift and go to state 281
+    IF              shift and go to state 282
+    FOR             shift and go to state 283
+    GENERATE        shift and go to state 284
+    SIGNAL          shift and go to state 84
+    (               shift and go to state 83
+    ADD             shift and go to state 78
+    SUB             shift and go to state 79
+    NOT             shift and go to state 88
+    NOTL            shift and go to state 89
+    INTEGER_CONST   shift and go to state 92
+    FLOAT_CONST     shift and go to state 93
 
+    exp                            shift and go to state 271
+    lVal                           shift and go to state 270
+    stmt                           shift and go to state 394
+    block                          shift and go to state 273
+    seqLogStmt                     shift and go to state 274
+    ifStmt                         shift and go to state 275
+    forStmt                        shift and go to state 276
+    lOrExp                         shift and go to state 70
+    lAndExp                        shift and go to state 71
+    redExp                         shift and go to state 72
+    eqExp                          shift and go to state 73
+    relExp                         shift and go to state 74
+    shiftExp                       shift and go to state 75
+    addExp                         shift and go to state 76
+    mulExp                         shift and go to state 77
+    unaryExp                       shift and go to state 80
+    primaryExp                     shift and go to state 81
+    unaryOp                        shift and go to state 85
+    number                         shift and go to state 87
+    circuit_const                  shift and go to state 94
 
 state 392
+
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp . ) COLON ID stmt
+    (122) circuit_const -> exp . BIT_WIDTH_NUMBER
+
+    )               shift and go to state 395
+    BIT_WIDTH_NUMBER shift and go to state 132
+
+
+state 393
 
     (96) elifStmt -> ELIF ( exp ) stmt . elifStmt
     (96) elifStmt -> . ELIF ( exp ) stmt elifStmt
@@ -14568,16 +14542,93 @@ state 392
     FLOAT_CONST     reduce using rule 1 (empty -> .)
     }               reduce using rule 1 (empty -> .)
     ELSE            reduce using rule 1 (empty -> .)
-    )               reduce using rule 1 (empty -> .)
 
   ! ELIF            [ reduce using rule 1 (empty -> .) ]
 
-    elifStmt                       shift and go to state 394
+    elifStmt                       shift and go to state 396
     empty                          shift and go to state 375
 
-state 393
+state 394
 
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID . stmt
+    (101) forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .
+
+    ;               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    RETURN          reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    CONST           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    ID              reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    {               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    MUX             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    WHEN            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    IF              reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    FOR             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    GENERATE        reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    INT             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    FLOAT           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    REG             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    WIRE            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    CLOCK           reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    SIGNAL          reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    (               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    ADD             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    SUB             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    NOT             reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    NOTL            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    INTEGER_CONST   reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    FLOAT_CONST     reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    }               reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    ELIF            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+    ELSE            reduce using rule 101 (forStmt -> FOR ( varDecl exp ; lVal = exp ) stmt .)
+
+
+state 395
+
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) . COLON ID stmt
+
+    COLON           shift and go to state 397
+
+
+state 396
+
+    (96) elifStmt -> ELIF ( exp ) stmt elifStmt .
+
+    ;               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    RETURN          reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    CONST           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    ID              reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    {               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    MUX             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    WHEN            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    IF              reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    FOR             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    GENERATE        reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    INT             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    FLOAT           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    REG             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    WIRE            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    CLOCK           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    SIGNAL          reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    (               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    ADD             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    SUB             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    NOT             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    NOTL            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    INTEGER_CONST   reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    FLOAT_CONST     reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    }               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    ELIF            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+    ELSE            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
+
+
+state 397
+
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON . ID stmt
+
+    ID              shift and go to state 398
+
+
+state 398
+
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID . stmt
     (84) stmt -> . lVal ASSIGN exp ;
     (85) stmt -> . lVal CONNECT exp ;
     (86) stmt -> . ;
@@ -14599,8 +14650,8 @@ state 393
     (94) seqLogStmt -> . WHEN ( ID . RISING ) stmt
     (95) seqLogStmt -> . WHEN ( ID . FALLING ) stmt
     (100) ifStmt -> . IF ( exp ) stmt elifStmt elseStmt
-    (101) forStmt -> . FOR ( varDecl exp ; stmt ) stmt
-    (102) forStmt -> . GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt
+    (101) forStmt -> . FOR ( varDecl exp ; lVal = exp ) stmt
+    (102) forStmt -> . GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt
     (163) lOrExp -> . lAndExp
     (164) lOrExp -> . lOrExp LOR lAndExp
     (161) lAndExp -> . redExp
@@ -14666,8 +14717,8 @@ state 393
     FLOAT_CONST     shift and go to state 93
 
     exp                            shift and go to state 271
-    stmt                           shift and go to state 395
     lVal                           shift and go to state 270
+    stmt                           shift and go to state 399
     block                          shift and go to state 273
     seqLogStmt                     shift and go to state 274
     ifStmt                         shift and go to state 275
@@ -14686,70 +14737,36 @@ state 393
     number                         shift and go to state 87
     circuit_const                  shift and go to state 94
 
-state 394
+state 399
 
-    (96) elifStmt -> ELIF ( exp ) stmt elifStmt .
+    (102) forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .
 
-    ;               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    RETURN          reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    CONST           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    ID              reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    {               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    MUX             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    WHEN            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    IF              reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    FOR             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    GENERATE        reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    INT             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    FLOAT           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    REG             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    WIRE            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    CLOCK           reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    SIGNAL          reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    (               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    ADD             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    SUB             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    NOT             reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    NOTL            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    INTEGER_CONST   reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    FLOAT_CONST     reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    }               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    ELIF            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    ELSE            reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-    )               reduce using rule 96 (elifStmt -> ELIF ( exp ) stmt elifStmt .)
-
-
-state 395
-
-    (102) forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .
-
-    ;               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    RETURN          reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    CONST           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    ID              reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    {               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    MUX             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    WHEN            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    IF              reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    FOR             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    GENERATE        reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    INT             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    FLOAT           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    REG             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    WIRE            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    CLOCK           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    SIGNAL          reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    (               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    ADD             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    SUB             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    NOT             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    NOTL            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    INTEGER_CONST   reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    FLOAT_CONST     reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    }               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    ELIF            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    ELSE            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
-    )               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; exp ) COLON ID stmt .)
+    ;               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    RETURN          reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    CONST           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    ID              reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    {               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    MUX             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    WHEN            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    IF              reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    FOR             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    GENERATE        reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    INT             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    FLOAT           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    REG             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    WIRE            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    CLOCK           reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    SIGNAL          reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    (               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    ADD             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    SUB             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    NOT             reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    NOTL            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    INTEGER_CONST   reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    FLOAT_CONST     reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    }               reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    ELIF            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
+    ELSE            reduce using rule 102 (forStmt -> GENERATE FOR ( varDecl exp ; lVal = exp ) COLON ID stmt .)
 
 WARNING: 
 WARNING: Conflicts:
@@ -14843,7 +14860,7 @@ WARNING: shift/reduce conflict for ( in state 311 resolved as shift
 WARNING: shift/reduce conflict for ( in state 364 resolved as shift
 WARNING: shift/reduce conflict for ELIF in state 368 resolved as shift
 WARNING: shift/reduce conflict for ELSE in state 373 resolved as shift
-WARNING: shift/reduce conflict for ELIF in state 392 resolved as shift
+WARNING: shift/reduce conflict for ELIF in state 393 resolved as shift
 WARNING: reduce/reduce conflict in state 157 resolved using rule (array_exp_repeat1 -> empty)
 WARNING: rejected rule (array_exp_repeat2 -> empty) in state 157
 WARNING: reduce/reduce conflict in state 161 resolved using rule (unaryExp -> unaryOp unaryExp)

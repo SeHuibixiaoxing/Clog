@@ -445,14 +445,14 @@ def p_ifStmt(p):
 
 def p_forStmt(p):
     """
-     forStmt : FOR '(' varDecl exp ';' stmt ')' stmt
-            | GENERATE FOR '(' varDecl exp ';' exp ')' COLON ID stmt
+     forStmt : FOR '(' varDecl exp ';' lVal ASSIGN exp ')' stmt
+            | GENERATE FOR '(' varDecl exp ';' lVal ASSIGN exp ')' COLON ID stmt
     """
     if p[1] == "generate":
-        p[0] = AST.ForStmtNode(p[4], p[6], p[8], p[11],p[12])
+        p[0] = AST.ForStmtNode(p[4], p[5], p[7], p[9], p[12], p[13])
         p[0].is_generate = True
     else:
-        p[0] = AST.ForStmtNode(p[3],p[5],p[7],p[9])
+        p[0] = AST.ForStmtNode(p[3], p[4], p[6], p[8], p[10])
 
 def p_exp(p):
     """
@@ -471,13 +471,13 @@ def p_lVal(p):
     """
     p[0] = AST.LValNode()
     if len(p) == 3:
-        p[0].add_child(p[1],p[2])
+        p[0].add_child(p[1], p[2])
     if len(p) == 6:
-        p[0].add_child(p[2],p[3],p[4])
+        p[0].add_child(p[2], p[3], p[4])
     if len(p) == 8:
-        p[0].add_child(p[3],p[5],p[7])
+        p[0].add_child(p[3], p[5], p[7])
     if len(p) == 4:
-        p[0].add_child(p[1],p[3])
+        p[0].add_child(p[1], p[3])
 
 def p_primaryExp(p):
     """
