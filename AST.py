@@ -179,7 +179,7 @@ class ModuleRparamsItemNode(ASTNode):
         if module.child[0].child[0].child[1].type.type in bundle_dict:
             bundle_node = bundle_dict[module.child[0].child[0].child[1].type.type]
             for i in range(len(bundle_node.child)):
-                file.write(direct)
+                #file.write(direct)
                 file.write('.')
                 file.write(self.formal_para)
                 file.write('$')
