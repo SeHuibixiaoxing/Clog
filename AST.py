@@ -3,6 +3,9 @@ import ply.yacc as yacc
 from token_rules import tokens
 
 in_seq = False
+bundle_dict = {}
+module_dict = {}
+block_vari_type = {}
 class ASTNode():
     def __init__(self, *childs):
         self.parent = None
@@ -143,6 +146,15 @@ class ModDeclNode(ASTNode):
         self.type = ""
         self.name = ""
 
+    def to_Verilog(self,file):
+        file.write(self.type)
+        file.write(' ')
+        file.write(self.name)
+        file.write('(\n')
+        self.child[0].to_Verilog(file)
+        self.child[1].to_Verilog(file)
+        file.write('\n);\n')
+
 
 class RPortDefNode(ASTNode):
     def __init__(self, *childs):
@@ -158,12 +170,42 @@ class ModuleRparamsItemNode(ASTNode):
         self.formal_para = ""
         self.actual_para = ""
 
+    def to_Verilog(self,file):
+        direct = self.child[0].direct
+        #如果是bundle的话特殊处理
+        global module_dict
+        global bundle_dict
+        module = module_dict[self.parent.parent.type]
+        if module.child[0].child[0].child[1].type.type in bundle_dict:
+            bundle_node = bundle_dict[module.child[0].child[0].child[1].type.type]
+            for i in range(len(bundle_node.child)):
+                file.write(direct)
+                file.write('.')
+                file.write(self.formal_para)
+                file.write('$')
+                file.write(bundle_node.child[i].name)
+                file.write('(')
+                file.write(self.actual_para)
+                file.write('$')
+                file.write(bundle_node.child[i].name)
+                file.write(')')
+                if i < len(bundle_node.child)-1:
+                    file.write(',\n')
+
+
+
 
 class ModuleRParams(ASTNode):
     # childs: a list of ModuleRparamsItemNode
 
     def __init__(self, *childs):
         super().__init__(*childs)
+
+    def to_Verilog(self,file):
+        for i in range(len(self.child)):
+            self.child[i].to_Verilog(file)
+            if i < len(self.child)-1:
+                file.write(',\n')
 
 class BundleParaNode(ASTNode):
     def __init__(self, *childs):
@@ -172,12 +214,22 @@ class BundleParaNode(ASTNode):
         self.name = ""
         self.type = ""
 
+    def to_Verilog(self,file,port,name):
+        file.write(port)
+        file.write(' ')
+        self.type.to_Verilog(file)
+        file.write(' ')
+        file.write(f'{name}${self.name}')
+
 class BundleNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
         self.name = ""
 
+    def to_Verilog(self,file):
+        #bundle声明的时候先不输出，加到dict里面
+        bundle_dict[self.name] = self
 
 class BundleDeclNode(ASTNode):
     # child[0]: BundleRParams
@@ -187,12 +239,25 @@ class BundleDeclNode(ASTNode):
 
         self.type = ""
 
+    def to_Verilog(self,file):
+        global bundle_dict
+        bundle_node = bundle_dict[self.type]
+        global block_vari_type
+        for i in range(len(self.child)):
+            bundledef = self.child[i]
+            block_vari_type[bundledef.name] = self.type
+            for j in range(len(bundle_node.child)):
+                bundle_node.child[j].to_Verilog(file,'',bundledef.name)
+                file.write(';\n')
 
 class BundleDefNode(ASTNode):
     def __init__(self, *childs):
         super().__init__(*childs)
 
         self.name = ""
+
+
+
 
 
 class InitValNode(ASTNode):
@@ -290,6 +355,8 @@ class ModuleNode(ASTNode):
 
         self.name = ""
     def to_Verilog(self,file):
+        global module_dict
+        module_dict[self.name] = self
         file.write(f"module {self.name}\n")
         para_cnt = 0
         for c in self.child:
@@ -335,6 +402,16 @@ class ModuleParaPortNode(ASTNode):
         self.name = ""
 
     def to_Verilog(self,file):
+        #如果是bundle要特殊处理
+        global bundle_dict
+        if self.child[0].child[1].type.type in bundle_dict:
+            bundle_node = bundle_dict[self.child[0].child[1].type.type]
+            block_vari_type[self.name] = self.child[0].child[1].type.type
+            for i in range(len(bundle_node.child)):
+                bundle_node.child[i].to_Verilog(file,self.child[0].child[0],self.name)
+                if i < len(bundle_node.child)-1:
+                    file.write(',\n')
+            return
         for c in self.child:
             c.to_Verilog(file)
         file.write(self.name)
@@ -344,6 +421,7 @@ class BlockNode(ASTNode):
         super().__init__(*childs)
 
     def to_Verilog(self,file):
+        global block_vari_type
         print_b_e = True
         if isinstance(self.parent,ModuleNode):
             print_b_e = False
@@ -355,6 +433,7 @@ class BlockNode(ASTNode):
             c.to_Verilog(file)
         if print_b_e:
             file.write('end\n')
+        block_vari_type = {}
 
 class BlockItemNode(ASTNode):
     def __init__(self, *childs):
@@ -385,6 +464,25 @@ class StmtNode(ASTNode):
             self.child[1].to_Verilog(file)
             file.write(';\n')
         if self.type == 'connect':
+            global block_vari_type
+            #如果是bundle要特殊处理
+            if isinstance(self.child[0].child[0],str) and (self.child[0].child[0] in block_vari_type):
+                bundle_node = bundle_dict[block_vari_type[self.child[0].child[0]]]
+                for i in range(len(bundle_node.child)):
+                    if not in_seq:
+                        file.write('assign ')
+                    self.child[0].to_Verilog(file)
+                    file.write('$')
+                    file.write(bundle_node.child[i].name)
+                    if in_seq:
+                        file.write('<=')
+                    else:
+                        file.write('=')
+                    self.child[1].to_Verilog(file)
+                    file.write('$')
+                    file.write(bundle_node.child[i].name)
+                    file.write(';\n')
+                return
             if not in_seq:
                 file.write('assign ')
             self.child[0].to_Verilog(file)
@@ -489,8 +587,8 @@ class LValNode(ASTNode):
 
         if self.flag == 'type3':
             self.child[0].to_Verilog(file)
-            file.write('.')
-            file.write(self.child[0])
+            file.write('$')
+            file.write(self.child[1])
         if self.flag == 'type4':
             file.write('{')
             for i in range(len(self.child)):

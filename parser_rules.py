@@ -165,7 +165,7 @@ def p_R_port_def(p):
 
 def p_module_R_params_item(p):
     """p_module_R_params_item : R_port_def ID '(' ID ')'"""
-    p[0] = AST.ModuleRparamsItemNode()
+    p[0] = AST.ModuleRparamsItemNode(p[1])
     p[0].formal_para = p[2]
     p[0].actual_para = p[4]
 
